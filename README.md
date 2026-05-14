@@ -1,11 +1,46 @@
-<div align="center">
+# Goddess Annaleese Creator Platform
 
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+Official single-creator content platform built with Next.js App Router.
 
-  <h1>Built with AI Studio</h2>
+## Core Experience
 
-  <p>The fastest path from prompt to production with Gemini.</p>
+- Animated splash screen with dive-in logo and zoom-out transition.
+- Creator entry portal with bio, niches, previews, and subscription pricing.
+- Subscriber app with Daily Feed, Inbox, Gallery, and Store Drops.
+- Ownership-aware unlocks for PPV and one-time purchases.
+- Private creator portal with dashboard, analytics, storage, studio, and admin controls.
 
-  <a href="https://aistudio.google.com/apps">Start building</a>
+## Security Model
 
-</div>
+- Signed token cookie (HTTP-only, strict same-site, secure in production).
+- Middleware route protection for `/app/*` and `/creator/*`.
+- Server-side guards per route segment.
+- Creator portal is accessible only with creator credentials.
+
+## Setup
+
+1. Copy `.env.example` to `.env.local`.
+2. Set strong values for `AUTH_SECRET` and `CREATOR_PASSWORD`.
+3. Install dependencies.
+4. Start development server.
+
+```bash
+npm install
+npm run dev
+```
+
+Open `http://localhost:3000`.
+
+## Routes
+
+- `/` splash animation
+- `/entry` creator entry + subscription and creator login
+- `/app` subscriber home (Daily Feed)
+- `/app/inbox`
+- `/app/gallery`
+- `/app/store`
+- `/creator`
+- `/creator/analytics`
+- `/creator/storage`
+- `/creator/studio`
+- `/creator/admin`

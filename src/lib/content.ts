@@ -1,0 +1,274 @@
+import type { AppSession } from "@/lib/auth";
+
+/* ── Access & mood types ─────────────────────────────── */
+
+export type AccessMode = "subscription" | "ppv" | "one-time";
+export type MoodTag = "Exclusive" | "BTS" | "Personal" | "PPV" | "Drop" | "Live";
+
+export type ContentItem = {
+  id: string;
+  title: string;
+  description: string;
+  mood: MoodTag;
+  access: AccessMode;
+  priceCents?: number;
+  pinned?: boolean;
+  /** gradient placeholder colours for thumbnails */
+  thumb: [string, string];
+  /** fake engagement numbers */
+  likes?: number;
+  comments?: number;
+  postedAt?: string;
+  /** Direct video/audio URL (external or CDN) */
+  videoUrl?: string;
+  /** Media type hint */
+  type?: "video" | "audio" | "photo" | "bundle" | "text";
+};
+
+export type ScrollThread = {
+  id: string;
+  subject: string;
+  preview: string;
+  timestamp: string;
+  ppv?: boolean;
+  priceCents?: number;
+  voice?: boolean;
+};
+
+/* ── Creator identity ─────────────────────────────────── */
+
+export const creatorProfile = {
+  name: "Goddess Annalesse",
+  tagline: "Welcome to the divine sanctum. Stay as long as you like.",
+  memberCount: "4,200",
+  bio: "Ethereal nights, golden light, and secrets whispered behind platinum gates. Exclusive visuals, intimate moments, and premium drops from inside the sanctum.",
+  teaserLines: [
+    "Daily posts in the Heavens — personal, intimate, real",
+    "Private reserves locked in the Vault",
+    "Live evenings on the Celestial Terrace",
+    "Sealed letters and divine voice notes just for you",
+  ],
+  collageQuotes: [
+    { text: "\"Every photo is a divine confession of how badly I want you to look… and touch.\"", label: "Philosophy" },
+    { text: "\"I built this sanctum so you could see every inch of me I don’t show anyone else… and beg for more.\"", label: "Bio" },
+    { text: "\"Golden hour is a state of mind… when my skin glows and my aura intoxicates.\"", label: "Saying" },
+    { text: "Born somewhere warm. Lives in the light, always dripping in platinum.", label: "About" },
+    { text: "\"The best things happen after sunset… when the halos come off.\"", label: "Mood" },
+  ],
+};
+
+/* ── Single-tier pricing ──────────────────────────────── */
+
+export const pricingPlans = [
+  {
+    id: "monthly" as const,
+    label: "Exclusive Access",
+    subtitle: "Monthly Membership",
+    price: "$15.99",
+    period: "/mo",
+    perks: ["Full content feed access", "Direct messaging", "Vault browsing", "Live session access"],
+    highlight: true,
+  },
+];
+
+/* ── El Jardín Feed posts ─────────────────────────────── */
+
+export const feedItems: ContentItem[] = [
+  {
+    id: "feed-golden-hour",
+    title: "Golden Hour on the Terrace",
+    description: "Caught this light just before the sun dipped behind the hills. No filter, just warmth.",
+    mood: "Personal",
+    access: "subscription",
+    pinned: true,
+    thumb: ["#8b5e3c", "#3d2a1e"],
+    likes: 342,
+    comments: 28,
+    postedAt: "2 hours ago",
+  },
+  {
+    id: "feed-bts-courtyard",
+    title: "Behind the Courtyard Shoot",
+    description: "How we turned an old stone wall into the backdrop for the new collection.",
+    mood: "BTS",
+    access: "subscription",
+    thumb: ["#6b4423", "#2e1e15"],
+    likes: 218,
+    comments: 15,
+    postedAt: "Yesterday",
+    type: "video",
+  },
+  {
+    id: "feed-velvet-night",
+    title: "Velvet Night (Extended Cut)",
+    description: "The full uncut reel from the candlelit evening session.",
+    mood: "PPV",
+    access: "ppv",
+    priceCents: 700,
+    thumb: ["#5c2e1a", "#1a0f0a"],
+    likes: 189,
+    comments: 42,
+    postedAt: "2 days ago",
+    type: "video",
+  },
+  {
+    id: "feed-blossom-reel",
+    title: "Orange Blossom Reel",
+    description: "A 60-second cinematic that premiered here first. Floral, warm, intimate.",
+    mood: "Exclusive",
+    access: "subscription",
+    thumb: ["#a0522d", "#3d2a1e"],
+    likes: 456,
+    comments: 37,
+    postedAt: "3 days ago",
+    type: "video",
+  },
+  {
+    id: "feed-personal-letter",
+    title: "A Note from the Hacienda",
+    description: "Personal update on what's coming next — and a small thank-you to everyone here.",
+    mood: "Personal",
+    access: "subscription",
+    thumb: ["#704214", "#241710"],
+    likes: 523,
+    comments: 61,
+    postedAt: "4 days ago",
+  },
+];
+
+/* ── La Bodega (Vault) items ──────────────────────────── */
+
+export const vaultItems: ContentItem[] = [
+  {
+    id: "vault-velvet-night",
+    title: "Velvet Night (Director Cut)",
+    description: "Extended cut with commentary and alternate score.",
+    mood: "PPV",
+    access: "ppv",
+    priceCents: 700,
+    thumb: ["#5c2e1a", "#1a0f0a"],
+    likes: 189,
+    comments: 42,
+    type: "video",
+  },
+  {
+    id: "vault-hacienda-prints",
+    title: "Hacienda Print Collection",
+    description: "High-res printable stills from the terracotta series.",
+    mood: "Exclusive",
+    access: "one-time",
+    priceCents: 1900,
+    thumb: ["#8b4513", "#3d1c02"],
+    likes: 134,
+    comments: 19,
+  },
+  {
+    id: "vault-siesta-pack",
+    title: "La Siesta Film Pack",
+    description: "Mini-film, poster pack, and ambient audio stems.",
+    mood: "Drop",
+    access: "one-time",
+    priceCents: 2500,
+    thumb: ["#704214", "#2e1e15"],
+    likes: 267,
+    comments: 33,
+    type: "video",
+  },
+  {
+    id: "vault-moonlit-garden",
+    title: "Moonlit Garden Session",
+    description: "Exclusive PPV scene from the late-night garden series.",
+    mood: "PPV",
+    access: "ppv",
+    priceCents: 1200,
+    thumb: ["#3d2a1e", "#1a0f0a"],
+    likes: 198,
+    comments: 24,
+    type: "video",
+  },
+  {
+    id: "vault-terraza-replay",
+    title: "La Terraza Live Replay",
+    description: "Full replay of the 2-hour live session under the stars.",
+    mood: "Live",
+    access: "ppv",
+    priceCents: 900,
+    thumb: ["#6b3410", "#1a0d01"],
+    likes: 312,
+    comments: 56,
+    type: "video",
+  },
+  {
+    id: "vault-blossom-collection",
+    title: "Orange Blossom Collection",
+    description: "Curated photo set from the spring estate shoot.",
+    mood: "Exclusive",
+    access: "one-time",
+    priceCents: 1500,
+    thumb: ["#a0522d", "#5c3a2a"],
+    likes: 245,
+    comments: 29,
+  },
+];
+
+/* ── Scroll (DM) threads ─────────────────────────────── */
+
+export const scrollThreads: ScrollThread[] = [
+  {
+    id: "dm-welcome",
+    subject: "Bienvenido — welcome to the hacienda",
+    preview: "Thanks for stepping through the gate. Your first private gallery is unlocked.",
+    timestamp: "Today, 3:42 PM",
+  },
+  {
+    id: "dm-ppv-teaser",
+    subject: "Something waiting for you in La Bodega",
+    preview: "A sealed preview — just for you…",
+    timestamp: "Yesterday, 11:18 PM",
+    ppv: true,
+    priceCents: 500,
+  },
+  {
+    id: "dm-voice-note",
+    subject: "Voice note — evening on the terrace",
+    preview: "▓▓▓░░░░░░░ 0:42",
+    timestamp: "Mar 21, 8:30 PM",
+    voice: true,
+    ppv: true,
+    priceCents: 300,
+  },
+  {
+    id: "dm-update",
+    subject: "Live on La Terraza this Saturday",
+    preview: "Mark your calendar — the terrace opens at 9 PM.",
+    timestamp: "Mar 20, 2:15 PM",
+  },
+];
+
+/* ── Tip tiers for The Offering ──────────────────────── */
+
+export const tipTiers = [
+  { id: "tip-small", label: "Flor", amountCents: 500, emoji: "🌸" },
+  { id: "tip-medium", label: "Vino", amountCents: 1500, emoji: "🍷" },
+  { id: "tip-large", label: "Fuego", amountCents: 5000, emoji: "🔥" },
+];
+
+/* ── Helpers ──────────────────────────────────────────── */
+
+export function priceLabel(priceCents?: number) {
+  if (!priceCents) return "Included";
+  return `$${(priceCents / 100).toFixed(2)}`;
+}
+
+export function canAccessContent(session: AppSession | null, item: ContentItem) {
+  if (!session) return false;
+  if (session.role === "creator") return true;
+  if (item.access === "subscription") return true;
+  return session.ownedContent.includes(item.id);
+}
+
+export function tierBadge(plan: string) {
+  if (plan === "yearly") return "🗝️ La Alcoba";
+  if (plan === "quarterly") return "🪞 El Salón";
+  return "🌿 El Jardín";
+}
