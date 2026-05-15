@@ -103,7 +103,11 @@ export default function R2VaultManager({ configured }: { configured: boolean }) 
   }, [prefix, showToast]);
 
   useEffect(() => {
-    if (configured) loadFiles("");
+    if (!configured) return;
+    const timer = window.setTimeout(() => {
+      void loadFiles("");
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [configured]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Upload a single file via presigned PUT ────────────────────────────────

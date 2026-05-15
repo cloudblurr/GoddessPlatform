@@ -97,7 +97,6 @@ export async function createPresignedUpload(
   expiresIn: number = 3600
 ): Promise<PresignedUpload> {
   const client = getClient();
-  const ext = fileName.split(".").pop() ?? "";
   const safeName = fileName.replace(/[^a-zA-Z0-9._-]/g, "_");
   const key = `${folder.replace(/^\/|\/$/g, "")}/${Date.now()}-${safeName}`;
 

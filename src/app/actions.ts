@@ -234,9 +234,9 @@ export async function creatorStudioPublish(formData: FormData) {
   const priceDollars = Number(formData.get("price") ?? 0);
   const priceCents = Number.isFinite(priceDollars) && priceDollars > 0 ? Math.round(priceDollars * 100) : undefined;
 
-  if (!title) redirect("/creator/feed?error=empty");
-  if (!description && contentKind !== "poll") redirect("/creator/feed?error=empty");
-  if (contentKind === "poll" && pollOptions.length < 2) redirect("/creator/feed?error=poll-options");
+  if (!title) redirect("/creator/studio?error=empty");
+  if (!description && contentKind !== "poll") redirect("/creator/studio?error=empty");
+  if (contentKind === "poll" && pollOptions.length < 2) redirect("/creator/studio?error=poll-options");
 
   const store = await readStore();
   const postId = `${contentKind}-${Date.now()}`;
@@ -315,9 +315,9 @@ export async function creatorStudioPublish(formData: FormData) {
 
   revalidatePath("/app");
   revalidatePath("/app/store");
-  revalidatePath("/creator/feed");
+  revalidatePath("/creator/studio");
   revalidatePath("/creator/vault");
-  redirect("/creator/feed?published=1");
+  redirect("/creator/studio?published=1");
 }
 
 /* ═══════════════════════════════════════════════════════════

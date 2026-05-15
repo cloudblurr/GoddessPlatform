@@ -1,5 +1,5 @@
-import MembershipDashboard from "@/components/MembershipDashboard";
+import EditorialFanFeed from "@/components/EditorialFanFeed";
 
 export default function SubscriberDashboardPage() {
-  return <MembershipDashboard userStatus="active" creatorStatus="online" />;
+  return <EditorialFanFeed />;
 }

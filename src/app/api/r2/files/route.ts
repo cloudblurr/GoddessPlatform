@@ -12,7 +12,10 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ configured: false, items: [] });
   }
 
-  const prefix = req.nextUrl.searchParams.get("prefix") ?? `creators/${session.userId}/`;
+  const requestedPrefix = req.nextUrl.searchParams.get("prefix");
+  const prefix = requestedPrefix && requestedPrefix.length > 0
+    ? requestedPrefix
+    : `creators/${session.userId}/uploads/`;
 
   try {
     const items = await listR2Files(prefix, 500);
