@@ -57,6 +57,16 @@ type FanFrontExperienceProps = {
 
 const feedPosts = [
   {
+    type: "Status",
+    title: "Back from set and sorting tonight's previews",
+    copy: "The first free preview is staying open for everyone until midnight. Campaign pass holders get the full chapter first.",
+    price: "Free",
+    state: "Public",
+    meta: "Creator update",
+    postedAt: "Today, 8:42 PM",
+    icon: Megaphone,
+  },
+  {
     type: "Creator drop",
     title: "Neon Afterglow: private gallery transmission",
     copy: "38 stills, two voice notes, and a director cut hidden behind the shimmer.",
@@ -64,6 +74,7 @@ const feedPosts = [
     price: "$18",
     state: "Locked",
     meta: "1.8K unlocks today",
+    postedAt: "Today, 8:06 PM",
     icon: Lock,
   },
   {
@@ -74,6 +85,7 @@ const feedPosts = [
     price: "Included",
     state: "Live soon",
     meta: "4h remaining",
+    postedAt: "Today, 7:25 PM",
     icon: Radio,
   },
   {
@@ -84,6 +96,7 @@ const feedPosts = [
     price: "$34",
     state: "Deal",
     meta: "32% off",
+    postedAt: "Today, 6:10 PM",
     icon: Package,
   },
   {
@@ -94,6 +107,7 @@ const feedPosts = [
     price: "Vote",
     state: "Open",
     meta: "2.4K votes",
+    postedAt: "Today, 5:38 PM",
     icon: Vote,
   },
   {
@@ -104,6 +118,7 @@ const feedPosts = [
     price: "$10+",
     state: "74%",
     meta: "$311 of $420",
+    postedAt: "Today, 4:52 PM",
     icon: Gem,
   },
   {
@@ -114,6 +129,7 @@ const feedPosts = [
     price: "$36",
     state: "Store",
     meta: "58 min",
+    postedAt: "Today, 3:44 PM",
     icon: ShoppingBag,
   },
   {
@@ -124,6 +140,7 @@ const feedPosts = [
     price: "$45",
     state: "Limited",
     meta: "6 slots left",
+    postedAt: "Today, 2:20 PM",
     icon: MessageCircle,
   },
   {
@@ -134,6 +151,8 @@ const feedPosts = [
     price: "$79 pass",
     state: "Room",
     meta: "12 chapters",
+    postedAt: "Yesterday, 9:18 PM",
+    portalSlug: "aurora-week",
     icon: Radio,
   },
   {
@@ -144,6 +163,8 @@ const feedPosts = [
     price: "$42 pass",
     state: "Portal",
     meta: "7 episodes",
+    postedAt: "Yesterday, 6:30 PM",
+    portalSlug: "chrome-bloom",
     icon: Radio,
   },
   {
@@ -154,6 +175,8 @@ const feedPosts = [
     price: "$36 pass",
     state: "Portal",
     meta: "5 replays",
+    postedAt: "Yesterday, 3:05 PM",
+    portalSlug: "midnight-replay",
     icon: Radio,
   },
   {
@@ -164,6 +187,7 @@ const feedPosts = [
     price: "$22",
     state: "New",
     meta: "34 pics",
+    postedAt: "Mon, 11:40 AM",
     icon: Gift,
   },
 ];
@@ -389,6 +413,7 @@ export default function FanFrontExperience({
   const [mode, setMode] = useState<FanFrontMode>(initialMode);
   const [entered, setEntered] = useState(false);
   const [liked, setLiked] = useState<Record<string, boolean>>({});
+  const [selectedPortal, setSelectedPortal] = useState("aurora-week");
 
   const statLine = useMemo(
     () => [
@@ -449,6 +474,7 @@ export default function FanFrontExperience({
       <div className="relative z-10 pb-28">
         <HeaderNav creator={creator} mode={mode} setMode={setMode} />
 
+        {mode !== "feed" && (
         <SectionShell className="pt-4 md:pt-6">
           <div className="grid min-h-[430px] gap-6 lg:grid-cols-[1.25fr_.75fr]">
             <div className="relative overflow-hidden rounded-lg border border-white/10 bg-black shadow-[0_30px_110px_rgba(0,0,0,.45)]">
@@ -476,7 +502,9 @@ export default function FanFrontExperience({
             <LeaderboardPanel />
           </div>
         </SectionShell>
+        )}
 
+        {mode !== "feed" && (
         <SectionShell className="pt-6">
           <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
             {rails.map((item) => {
@@ -496,11 +524,12 @@ export default function FanFrontExperience({
             })}
           </div>
         </SectionShell>
+        )}
 
         <SectionShell className="pt-6">
-          {mode === "feed" && <FeedFront setMode={setMode} liked={liked} setLiked={setLiked} />}
+          {mode === "feed" && <FeedFront setMode={setMode} liked={liked} setLiked={setLiked} setSelectedPortal={setSelectedPortal} />}
           {mode === "store" && <StoreFront setMode={setMode} />}
-          {mode === "campaign" && <CampaignFront creatorId={creatorId} />}
+          {mode === "campaign" && <CampaignFront creatorId={creatorId} activePortalSlug={selectedPortal} setSelectedPortal={setSelectedPortal} />}
           {mode === "library" && <SimplePanel title="My Library" icon={Library} copy="Unlocked drops, purchased customs, campaign passes, and replay access are organized here." />}
           {mode === "wallet" && <SimplePanel title="Wallet" icon={Wallet} copy="Track credits, tips, unlock history, subscriptions, and campaign contributions." />}
           {mode === "profile" && <SimplePanel title="Fan Profile" icon={User} copy="Your fan badges, leaderboard streak, private preferences, and saved creator worlds live here." />}
@@ -637,160 +666,141 @@ function FeedFront({
   setMode,
   liked,
   setLiked,
+  setSelectedPortal,
 }: {
   setMode: (mode: FanFrontMode) => void;
   liked: Record<string, boolean>;
   setLiked: Dispatch<SetStateAction<Record<string, boolean>>>;
+  setSelectedPortal: Dispatch<SetStateAction<string>>;
 }) {
   return (
-    <div className="space-y-6">
-      <div className="grid gap-4 lg:grid-cols-[1fr_340px]">
-        <LuxuryCard>
-          <CardContent className="p-4 sm:p-5">
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-              <div>
-                <Badge variant="neon">Discovery board</Badge>
-                <h2 className="mt-3 text-3xl font-bold tracking-normal sm:text-4xl">Find the good stuff faster.</h2>
-                <p className="mt-2 text-sm text-white/58">Jump by type, campaign, unlock status, deal, or creator moment.</p>
-              </div>
-              <div className="relative w-full lg:w-72">
-                <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-white/40" />
-                <Input placeholder="Search drops, polls, deals" className="h-11 rounded-full border-white/10 bg-black/25 pl-9" />
-              </div>
-            </div>
-            <div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-4">
-              {quickCollections.map((item) => (
-                <button key={item.title} type="button" onClick={() => setMode(item.mode)} className="group relative min-h-40 overflow-hidden rounded-lg border border-white/10 bg-black text-left">
-                  <Image src={item.image} alt={item.title} fill sizes="25vw" className="object-cover opacity-70 transition duration-500 group-hover:scale-105" />
-                  <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent,rgba(0,0,0,.84))]" />
-                  <div className="absolute inset-x-0 bottom-0 p-3">
-                    <p className="font-semibold">{item.title}</p>
-                    <p className="text-xs text-white/55">{item.count}</p>
-                  </div>
-                </button>
-              ))}
-            </div>
-            <div className="mt-4 flex gap-2 overflow-x-auto pb-1">
-              {feedShortcuts.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <button key={item.label} type="button" className="flex min-w-36 items-center gap-3 rounded-full border border-white/10 bg-white/[0.055] px-4 py-3 text-left">
-                    <Icon className="size-4 text-cyan-200" />
-                    <span>
-                      <span className="block text-sm font-semibold">{item.label}</span>
-                      <span className="block text-xs text-white/45">{item.detail}</span>
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </CardContent>
-        </LuxuryCard>
-
-        <LuxuryCard>
-          <CardContent className="p-5">
-            <Badge variant="gold">Today</Badge>
-            <div className="mt-4 grid gap-3">
-              {["Live room opens at 10", "Aurora pass 32% off", "Wishlist 74% funded"].map((item) => (
-                <div key={item} className="flex items-center gap-3 rounded-lg border border-white/10 bg-white/[0.055] p-3">
-                  <Sparkles className="size-4 text-amber-100" />
-                  <p className="text-sm font-semibold">{item}</p>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </LuxuryCard>
+    <div className="space-y-4">
+      <div className="flex flex-col gap-3 rounded-lg border border-white/10 bg-white/[0.045] p-4 backdrop-blur md:flex-row md:items-center md:justify-between">
+        <div>
+          <Badge variant="gold">Fan feed</Badge>
+          <h2 className="mt-2 text-3xl font-bold tracking-normal">Waterfall timeline</h2>
+          <p className="mt-1 text-sm text-white/55">Status posts, campaign portals, free previews, and unlocks in timestamp order.</p>
+        </div>
+        <div className="flex gap-2 overflow-x-auto pb-1 md:pb-0">
+          {["All", "Free", "Unlocks", "Campaigns", "Status"].map((filter) => (
+            <button
+              key={filter}
+              type="button"
+              className={cn(
+                "rounded-full border border-white/10 px-4 py-2 text-sm font-semibold text-white/60 transition hover:text-white",
+                filter === "All" && "bg-white text-black",
+              )}
+            >
+              {filter}
+            </button>
+          ))}
+        </div>
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
-        <div>
-          <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
-            <div>
-              <Badge variant="gold">Multi-column feed</Badge>
-              <h3 className="mt-2 text-2xl font-bold tracking-normal">More posts on screen, less endless scrolling.</h3>
-            </div>
-            <div className="flex rounded-full border border-white/10 bg-white/[0.055] p-1">
-              {["Grid", "Latest", "Unlocked"].map((item) => (
+      <div className="columns-1 gap-4 sm:columns-2 xl:columns-3">
+        {feedPosts.map((post, index) => {
+          const Icon = post.icon;
+          const isCampaign = post.type === "CampaignPortal";
+          const hasImage = "image" in post && Boolean(post.image);
+          return (
+            <motion.article
+              key={post.title}
+              initial={{ y: 18, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: index * 0.04 }}
+              className="mb-4 break-inside-avoid overflow-hidden rounded-lg border border-white/10 bg-white/[0.055] shadow-[0_18px_60px_rgba(0,0,0,.26)] backdrop-blur-xl"
+            >
+              <div className="flex items-center gap-3 border-b border-white/10 p-4">
+                <span className="grid size-10 place-items-center rounded-full bg-white/10">
+                  <Icon className="size-4 text-cyan-100" />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Badge variant={isCampaign ? "gold" : post.state === "Locked" ? "neon" : "luxury"}>{post.type}</Badge>
+                    <span className="text-xs text-white/45">{post.postedAt}</span>
+                  </div>
+                  <p className="mt-1 truncate text-xs text-white/42">{post.meta}</p>
+                </div>
+              </div>
+
+              {hasImage ? (
                 <button
-                  key={item}
                   type="button"
-                  className={cn(
-                    "rounded-full px-4 py-2 text-xs font-semibold text-white/55",
-                    item === "Grid" && "bg-white text-black",
-                  )}
+                  onClick={() => {
+                    if (isCampaign) {
+                      setSelectedPortal(post.portalSlug ?? "aurora-week");
+                      setMode("campaign");
+                    }
+                  }}
+                  className="group relative block aspect-[4/3] w-full overflow-hidden bg-black text-left"
                 >
-                  {item}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="grid auto-rows-[10px] grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {feedPosts.map((post, index) => {
-            const Icon = post.icon;
-            const tall = index % 5 === 0 || index % 5 === 3;
-            return (
-              <motion.article
-                key={post.title}
-                initial={{ y: 22, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: index * 0.06 }}
-                className={cn(
-                  "overflow-hidden rounded-lg border border-white/10 bg-white/[0.055] shadow-[0_24px_80px_rgba(0,0,0,.3)] backdrop-blur-xl",
-                  tall ? "row-span-[38]" : "row-span-[31]",
-                )}
-              >
-                <div className="relative h-full min-h-[300px]">
-                  <Image src={post.image} alt={post.title} fill sizes="(min-width:1280px) 40vw, 100vw" className={cn("object-cover", post.state === "Locked" && "blur-sm")} />
-                  <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(5,7,17,.1),rgba(5,7,17,.92))]" />
+                  <Image
+                    src={post.image}
+                    alt={post.title}
+                    fill
+                    sizes="(min-width:1280px) 33vw, (min-width:640px) 50vw, 100vw"
+                    className={cn("object-cover transition duration-500 group-hover:scale-105", post.state === "Locked" && "blur-[2px]")}
+                  />
+                  <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,.04),rgba(0,0,0,.72))]" />
                   {post.state === "Locked" && (
-                    <div className="absolute inset-0 grid place-items-center bg-black/22 p-4 text-center backdrop-blur-[2px]">
-                      <div className="max-w-xs rounded-lg border border-white/15 bg-black/45 p-4">
-                        <Lock className="mx-auto size-7 text-cyan-200" />
-                        <p className="mt-2 font-semibold">Locked preview</p>
-                        <p className="mt-1 text-xs text-white/60">Unlock or grab the bundle.</p>
-                        <Button className="mt-3 w-full" size="sm" variant="neon" onClick={() => setMode("store")}>Unlock {post.price}</Button>
+                    <div className="absolute inset-0 grid place-items-center">
+                      <div className="rounded-full border border-white/15 bg-black/60 px-4 py-2 text-sm font-semibold backdrop-blur">
+                        Locked preview
                       </div>
                     </div>
                   )}
-                  <div className="absolute inset-x-0 bottom-0 p-4">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <Badge variant="luxury"><Icon className="size-3" />{post.type}</Badge>
-                      <Badge variant={post.state === "Deal" ? "gold" : "neon"}>{post.state}</Badge>
+                  {isCampaign && (
+                    <div className="absolute bottom-3 left-3 right-3 rounded-lg border border-white/15 bg-black/62 p-3 backdrop-blur">
+                      <p className="text-sm font-semibold">Open CampaignPortal</p>
+                      <p className="text-xs text-white/55">{post.meta}</p>
                     </div>
-                    <h3 className="mt-3 text-xl font-bold leading-tight tracking-normal">{post.title}</h3>
-                    <p className="mt-2 line-clamp-2 text-sm leading-6 text-white/66">{post.copy}</p>
-                    <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-3">
-                      <div className="flex items-center gap-3 text-sm text-white/55">
-                        <span>{post.meta}</span>
-                        <span>{post.price}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {post.type === "CampaignPortal" ? (
-                          <Button variant="neon" size="sm" onClick={() => setMode("campaign")}>
-                            <Radio className="size-4" />
-                            Enter
-                          </Button>
-                        ) : (
-                          <>
-                            <Button variant="ghost" size="sm" onClick={() => setLiked((prev) => ({ ...prev, [post.title]: !prev[post.title] }))}>
-                              <Heart className={cn("size-4", liked[post.title] && "fill-fuchsia-300 text-fuchsia-300")} />
-                              {liked[post.title] ? "Loved" : "Love"}
-                            </Button>
-                            <Button variant="ghost" size="sm"><MessageCircle className="size-4" />Comment</Button>
-                            <Button variant="luxury" size="sm"><Wallet className="size-4" />Tip</Button>
-                          </>
-                        )}
-                      </div>
-                    </div>
+                  )}
+                </button>
+              ) : null}
+
+              <div className="p-4">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge variant={post.state === "Deal" ? "gold" : "outline"}>{post.state}</Badge>
+                  <span className="text-sm font-semibold text-white/65">{post.price}</span>
+                </div>
+                <h3 className="mt-3 text-xl font-bold leading-tight tracking-normal">{post.title}</h3>
+                <p className="mt-2 text-sm leading-6 text-white/64">{post.copy}</p>
+                <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-white/10 pt-3">
+                  {isCampaign ? (
+                    <Button
+                      variant="neon"
+                      size="sm"
+                      onClick={() => {
+                        setSelectedPortal(post.portalSlug ?? "aurora-week");
+                        setMode("campaign");
+                      }}
+                    >
+                      <Radio className="size-4" />
+                      Enter portal
+                    </Button>
+                  ) : post.state === "Locked" || post.type === "Store-only" ? (
+                    <Button variant="neon" size="sm" onClick={() => setMode("store")}>
+                      <Lock className="size-4" />
+                      Unlock
+                    </Button>
+                  ) : (
+                    <Button variant="luxury" size="sm">
+                      <Play className="size-4" />
+                      Open
+                    </Button>
+                  )}
+                  <div className="flex items-center gap-1">
+                    <Button variant="ghost" size="sm" onClick={() => setLiked((prev) => ({ ...prev, [post.title]: !prev[post.title] }))}>
+                      <Heart className={cn("size-4", liked[post.title] && "fill-fuchsia-300 text-fuchsia-300")} />
+                    </Button>
+                    <Button variant="ghost" size="sm"><MessageCircle className="size-4" /></Button>
+                    <Button variant="ghost" size="sm"><Bookmark className="size-4" /></Button>
                   </div>
                 </div>
-              </motion.article>
-            );
-          })}
-          </div>
-        </div>
-
-        <FeedSidebar />
+              </div>
+            </motion.article>
+          );
+        })}
       </div>
     </div>
   );
@@ -922,8 +932,16 @@ function StoreFront({ setMode }: { setMode: (mode: FanFrontMode) => void }) {
   );
 }
 
-function CampaignFront({ creatorId }: { creatorId: string }) {
-  const featuredPortal = campaignPortals[0];
+function CampaignFront({
+  creatorId,
+  activePortalSlug,
+  setSelectedPortal,
+}: {
+  creatorId: string;
+  activePortalSlug: string;
+  setSelectedPortal: Dispatch<SetStateAction<string>>;
+}) {
+  const featuredPortal = campaignPortals.find((portal) => portal.slug === activePortalSlug) ?? campaignPortals[0];
 
   return (
     <div className="space-y-6">
@@ -960,8 +978,10 @@ function CampaignFront({ creatorId }: { creatorId: string }) {
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
-        {campaignPortals.map((portal) => (
-          <LuxuryCard key={portal.slug} className="overflow-hidden">
+        {campaignPortals.map((portal) => {
+          const active = portal.slug === featuredPortal.slug;
+          return (
+          <LuxuryCard key={portal.slug} className={cn("overflow-hidden", active && "border-cyan-200/45 shadow-[0_0_45px_rgba(20,241,217,.12)]")}>
             <div className="relative h-56 bg-black">
               <Image src={portal.image} alt={portal.title} fill sizes="(min-width:768px) 33vw, 100vw" className="object-cover opacity-80" />
               <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent,rgba(5,7,17,.9))]" />
@@ -975,13 +995,19 @@ function CampaignFront({ creatorId }: { creatorId: string }) {
             <CardContent className="p-4">
               <p className="text-sm leading-6 text-white/62">{portal.tagline}</p>
               <Progress value={portal.progress} className="mt-4" />
-              <Button variant="neon" size="sm" className="mt-4 w-full">
+              <Button
+                variant={active ? "luxury" : "neon"}
+                size="sm"
+                className="mt-4 w-full"
+                onClick={() => setSelectedPortal(portal.slug)}
+              >
                 <Radio className="size-4" />
-                Enter portal
+                {active ? "Current portal" : "Enter portal"}
               </Button>
             </CardContent>
           </LuxuryCard>
-        ))}
+          );
+        })}
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[280px_1fr]">
@@ -990,7 +1016,7 @@ function CampaignFront({ creatorId }: { creatorId: string }) {
             <Badge variant="neon">Episode index</Badge>
             <div className="mt-4 rounded-lg border border-white/10 bg-white/[0.04] p-3">
               <p className="text-sm font-semibold">Current portal</p>
-              <p className="mt-1 text-xs text-white/50">Aurora Week storybook catalog</p>
+              <p className="mt-1 text-xs text-white/50">{featuredPortal.title} storybook catalog</p>
             </div>
             <div className="mt-4 space-y-2">
               {campaignEpisodes.map((episode, index) => (
