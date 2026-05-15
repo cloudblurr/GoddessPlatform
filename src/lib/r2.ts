@@ -14,6 +14,7 @@ import {
   PutObjectCommand,
   GetObjectCommand,
   DeleteObjectCommand,
+  CopyObjectCommand,
   ListObjectsV2Command,
   HeadObjectCommand,
   type ListObjectsV2CommandOutput,
@@ -205,6 +206,30 @@ export async function listR2Files(
 export async function deleteR2File(key: string): Promise<void> {
   const client = getClient();
   await client.send(new DeleteObjectCommand({ Bucket: BUCKET, Key: key }));
+}
+
+export async function renameR2File(
+  sourceKey: string,
+  destinationKey: string
+): Promise<{ key: string; publicUrl: string; mediaUrl: string }> {
+  const client = getClient();
+  const safeSource = sourceKey.replace(/^\/+/, "");
+  const safeDestination = destinationKey.replace(/^\/+/, "");
+
+  await client.send(new CopyObjectCommand({
+    Bucket: BUCKET,
+    CopySource: `${BUCKET}/${encodeURIComponent(safeSource).replace(/%2F/g, "/")}`,
+    Key: safeDestination,
+    MetadataDirective: "COPY",
+  }));
+
+  await client.send(new DeleteObjectCommand({ Bucket: BUCKET, Key: safeSource }));
+
+  return {
+    key: safeDestination,
+    publicUrl: publicUrl(safeDestination),
+    mediaUrl: appMediaUrl(safeDestination),
+  };
 }
 
 // ─── Head (check exists + get metadata) ──────────────────────────────────────

@@ -3,13 +3,13 @@ import { requireCreator } from "@/lib/guards";
 import { listR2Files, r2IsConfigured } from "@/lib/r2";
 
 export default async function CreatorDashboard() {
-  await requireCreator();
+  const session = await requireCreator();
 
   // Real R2 storage stats
   let storageStats = { usedBytes: 0, fileCount: 0, configured: false };
   if (r2IsConfigured()) {
     try {
-      const files = await listR2Files("", 500);
+      const files = await listR2Files(`creators/${session.userId}/uploads/`, 500);
       const fileItems = files.filter(f => !f.isFolder);
       storageStats = {
         usedBytes: fileItems.reduce((s, f) => s + f.size, 0),

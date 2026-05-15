@@ -6,7 +6,7 @@ type PageProps = {
   params: Promise<{ creatorId: string }>;
 };
 
-export default async function DemoCreatorStorePage({ params }: PageProps) {
+export default async function DemoCreatorCampaignPage({ params }: PageProps) {
   const { creatorId } = await params;
   const creator = getDemoCreator(creatorId);
 
@@ -14,5 +14,5 @@ export default async function DemoCreatorStorePage({ params }: PageProps) {
     notFound();
   }
 
-  return <FanFrontExperience creator={creator} creatorId={creatorId} initialMode="store" />;
+  return <FanFrontExperience creator={creator} creatorId={creatorId} initialMode="campaign" />;
 }

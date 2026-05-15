@@ -14,8 +14,7 @@ import {
   Radio, 
   Settings, 
   HelpCircle, 
-  LogOut,
-  ChevronDown
+  LogOut
 } from "lucide-react";
 import { requireCreator } from "@/lib/guards";
 import { logoutAction } from "@/app/actions";
@@ -24,25 +23,28 @@ export default async function CreatorLayout({ children }: { children: ReactNode 
   await requireCreator();
 
   return (
-    <div className="flex h-screen bg-[#050505] text-white overflow-hidden font-sans">
+    <div className="flex h-screen bg-[#04040a] text-white overflow-hidden font-sans">
       
       {/* Sleek Sidebar */}
-      <aside className="w-64 flex flex-col border-r border-[#ffffff10] bg-[#0a0a0a] relative z-10 shadow-[4px_0_24px_rgba(0,0,0,0.5)]">
-        <div className="h-20 flex items-center px-6 border-b border-[#ffffff10] gap-3">
-          <Image
-            src="/logo.jpg"
-            alt="Creator"
-            width={36}
-            height={36}
-            className="rounded-full"
-          />
+      <aside className="w-64 flex flex-col border-r border-[#f6e05e1f] bg-[#07070d]/95 relative z-10 shadow-[18px_0_80px_rgba(0,0,0,0.45)] backdrop-blur-xl">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-44 bg-[radial-gradient(circle_at_25%_0%,rgba(246,224,94,0.18),transparent_68%)]" />
+        <div className="relative h-24 flex items-center px-6 border-b border-[#ffffff10] gap-3">
+          <div className="rounded-full bg-gradient-to-br from-[#F6E05E] via-[#F687B3] to-[#76E4F7] p-[2px] shadow-[0_0_30px_rgba(246,224,94,0.22)]">
+            <Image
+              src="/logo.jpg"
+              alt="Creator"
+              width={40}
+              height={40}
+              className="rounded-full"
+            />
+          </div>
           <div>
-            <h1 className="text-lg font-bold font-heading tracking-wider text-[#C9A84C]">Creator</h1>
-            <p className="text-xs text-white/40 font-mono">Command Center</p>
+            <h1 className="text-lg font-bold font-heading tracking-wider text-[#F6E05E]">Creator</h1>
+            <p className="text-xs text-white/45 font-mono">Luxury Control Room</p>
           </div>
         </div>
         
-        <nav className="flex-1 py-6 px-4 flex flex-col gap-1 overflow-y-auto">
+        <nav className="relative flex-1 py-6 px-4 flex flex-col gap-1 overflow-y-auto">
           <Link href="/creator" className="flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-[#ffffff05] transition-all text-[#ffffff80] hover:text-[#C9A84C] group">
             <LayoutDashboard size={18} className="group-hover:drop-shadow-[0_0_8px_rgba(201,168,76,0.6)]" />
             <span className="text-sm font-medium">Dashboard</span>
@@ -109,6 +111,10 @@ export default async function CreatorLayout({ children }: { children: ReactNode 
         </nav>
 
         <div className="p-4 border-t border-[#ffffff10]">
+          <div className="mb-4 rounded-2xl border border-[#F6E05E]/20 bg-[#F6E05E]/5 p-4">
+            <p className="text-[0.65rem] font-mono uppercase tracking-[0.18em] text-[#F6E05E]">Vault Status</p>
+            <p className="mt-1 text-sm text-white/70">R2 media library, store assets, and FanFront drops stay synced here.</p>
+          </div>
           <form action={logoutAction}>
             <button
               type="submit"
@@ -124,7 +130,8 @@ export default async function CreatorLayout({ children }: { children: ReactNode 
       {/* Main Content Pane */}
       <main className="flex-1 relative overflow-y-auto w-full">
         {/* Subtle background glow */}
-        <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-[#C9A84C] opacity-[0.03] blur-[120px] rounded-full pointer-events-none"></div>
+        <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-[#C9A84C] opacity-[0.05] blur-[120px] rounded-full pointer-events-none"></div>
+        <div className="absolute bottom-[-20%] right-[-10%] h-[420px] w-[420px] rounded-full bg-cyan-400/5 blur-[140px] pointer-events-none"></div>
         
         <div className="p-8 lg:p-12 max-w-7xl mx-auto w-full">
           {children}

@@ -12,10 +12,9 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ configured: false, items: [] });
   }
 
-  const requestedPrefix = req.nextUrl.searchParams.get("prefix");
-  const prefix = requestedPrefix && requestedPrefix.length > 0
-    ? requestedPrefix
-    : `creators/${session.userId}/uploads/`;
+  const creatorRoot = `creators/${session.userId}/uploads/`;
+  const requestedPrefix = req.nextUrl.searchParams.get("prefix") ?? creatorRoot;
+  const prefix = requestedPrefix.startsWith(creatorRoot) ? requestedPrefix : creatorRoot;
 
   try {
     const items = await listR2Files(prefix, 500);
