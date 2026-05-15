@@ -1,5 +1,8 @@
-import EditorialFanFeed from "@/components/EditorialFanFeed";
+import FanFrontExperience from "@/components/FanFrontExperience";
+import { DEMO_CREATORS } from "@/lib/demo-mode";
 
 export default function SubscriberDashboardPage() {
-  return <EditorialFanFeed />;
+  const creator = DEMO_CREATORS[0];
+
+  return <FanFrontExperience creator={creator} creatorId={creator.id} initialMode="feed" />;
 }

@@ -86,6 +86,66 @@ const feedPosts = [
     meta: "32% off",
     icon: Package,
   },
+  {
+    type: "Poll",
+    title: "Choose tomorrow's private room theme",
+    copy: "Fans are voting between chrome noir, soft hotel, and after-hours studio.",
+    image: "/BossyUI.jpg",
+    price: "Vote",
+    state: "Open",
+    meta: "2.4K votes",
+    icon: Vote,
+  },
+  {
+    type: "Wishlist",
+    title: "Chrome Bloom set build",
+    copy: "Help fund the reflective wall kit that unlocks the next campaign chapter.",
+    image: "/xanamain.jpg",
+    price: "$10+",
+    state: "74%",
+    meta: "$311 of $420",
+    icon: Gem,
+  },
+  {
+    type: "Store-only",
+    title: "Midnight Replay Pack",
+    copy: "A replay bundle with creator commentary, two locked scenes, and gallery extras.",
+    image: "/StarlightUI.jpg",
+    price: "$36",
+    state: "Store",
+    meta: "58 min",
+    icon: ShoppingBag,
+  },
+  {
+    type: "Customs",
+    title: "Voice note queue opens",
+    copy: "Ten custom slots with prompt notes, priority delivery, and library storage.",
+    image: "/anna4.jpg",
+    price: "$45",
+    state: "Limited",
+    meta: "6 slots left",
+    icon: MessageCircle,
+  },
+  {
+    type: "Campaign",
+    title: "Aurora Week episode room",
+    copy: "The full chapter catalog is open with locked and unlocked content side-by-side.",
+    image: "/GloryUI.jpg",
+    price: "$79 pass",
+    state: "Room",
+    meta: "12 chapters",
+    icon: Radio,
+  },
+  {
+    type: "Deal",
+    title: "Polaroid Desk Drop",
+    copy: "Limited photo set with four unlockable variations and a private thank-you card.",
+    image: "/LavendarUI.jpg",
+    price: "$22",
+    state: "New",
+    meta: "34 pics",
+    icon: Gift,
+  },
 ];
 
 const rails = [
@@ -586,10 +646,32 @@ function FeedFront({
         </LuxuryCard>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
-        <div className="grid gap-4 xl:grid-cols-2">
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
+        <div>
+          <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <Badge variant="gold">Multi-column feed</Badge>
+              <h3 className="mt-2 text-2xl font-bold tracking-normal">More posts on screen, less endless scrolling.</h3>
+            </div>
+            <div className="flex rounded-full border border-white/10 bg-white/[0.055] p-1">
+              {["Grid", "Latest", "Unlocked"].map((item) => (
+                <button
+                  key={item}
+                  type="button"
+                  className={cn(
+                    "rounded-full px-4 py-2 text-xs font-semibold text-white/55",
+                    item === "Grid" && "bg-white text-black",
+                  )}
+                >
+                  {item}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="grid auto-rows-[10px] grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {feedPosts.map((post, index) => {
             const Icon = post.icon;
+            const tall = index % 5 === 0 || index % 5 === 3;
             return (
               <motion.article
                 key={post.title}
@@ -598,30 +680,30 @@ function FeedFront({
                 transition={{ delay: index * 0.06 }}
                 className={cn(
                   "overflow-hidden rounded-lg border border-white/10 bg-white/[0.055] shadow-[0_24px_80px_rgba(0,0,0,.3)] backdrop-blur-xl",
-                  index === 0 && "xl:col-span-2",
+                  tall ? "row-span-[38]" : "row-span-[31]",
                 )}
               >
-                <div className={cn("relative", index === 0 ? "min-h-[360px]" : "min-h-[280px]")}>
+                <div className="relative h-full min-h-[300px]">
                   <Image src={post.image} alt={post.title} fill sizes="(min-width:1280px) 40vw, 100vw" className={cn("object-cover", post.state === "Locked" && "blur-sm")} />
                   <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(5,7,17,.1),rgba(5,7,17,.92))]" />
                   {post.state === "Locked" && (
-                    <div className="absolute inset-0 grid place-items-center bg-black/25 p-6 text-center backdrop-blur-[2px]">
-                      <div className="max-w-sm rounded-lg border border-white/15 bg-black/45 p-5">
-                        <Lock className="mx-auto size-8 text-cyan-200" />
-                        <p className="mt-3 font-semibold">Premium content locked</p>
-                        <p className="mt-1 text-sm text-white/60">Unlock this post or grab the full bundle in Store.</p>
-                        <Button className="mt-4 w-full" variant="neon" onClick={() => setMode("store")}>Unlock {post.price}</Button>
+                    <div className="absolute inset-0 grid place-items-center bg-black/22 p-4 text-center backdrop-blur-[2px]">
+                      <div className="max-w-xs rounded-lg border border-white/15 bg-black/45 p-4">
+                        <Lock className="mx-auto size-7 text-cyan-200" />
+                        <p className="mt-2 font-semibold">Locked preview</p>
+                        <p className="mt-1 text-xs text-white/60">Unlock or grab the bundle.</p>
+                        <Button className="mt-3 w-full" size="sm" variant="neon" onClick={() => setMode("store")}>Unlock {post.price}</Button>
                       </div>
                     </div>
                   )}
-                  <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
+                  <div className="absolute inset-x-0 bottom-0 p-4">
                     <div className="flex flex-wrap items-center gap-2">
                       <Badge variant="luxury"><Icon className="size-3" />{post.type}</Badge>
                       <Badge variant={post.state === "Deal" ? "gold" : "neon"}>{post.state}</Badge>
                     </div>
-                    <h3 className="mt-4 text-2xl font-bold tracking-normal sm:text-3xl">{post.title}</h3>
-                    <p className="mt-2 max-w-2xl text-sm leading-6 text-white/66">{post.copy}</p>
-                    <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-4">
+                    <h3 className="mt-3 text-xl font-bold leading-tight tracking-normal">{post.title}</h3>
+                    <p className="mt-2 line-clamp-2 text-sm leading-6 text-white/66">{post.copy}</p>
+                    <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-3">
                       <div className="flex items-center gap-3 text-sm text-white/55">
                         <span>{post.meta}</span>
                         <span>{post.price}</span>
@@ -640,6 +722,7 @@ function FeedFront({
               </motion.article>
             );
           })}
+          </div>
         </div>
 
         <FeedSidebar />
