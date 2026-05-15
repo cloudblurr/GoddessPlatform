@@ -127,13 +127,33 @@ const feedPosts = [
     icon: MessageCircle,
   },
   {
-    type: "Campaign",
+    type: "CampaignPortal",
     title: "Aurora Week episode room",
     copy: "The full chapter catalog is open with locked and unlocked content side-by-side.",
     image: "/GloryUI.jpg",
     price: "$79 pass",
     state: "Room",
     meta: "12 chapters",
+    icon: Radio,
+  },
+  {
+    type: "CampaignPortal",
+    title: "Chrome Bloom story vault",
+    copy: "A campaign portal with quote cards, behind-the-scenes notes, locked galleries, and sponsor goals.",
+    image: "/SteamyUI.jpg",
+    price: "$42 pass",
+    state: "Portal",
+    meta: "7 episodes",
+    icon: Radio,
+  },
+  {
+    type: "CampaignPortal",
+    title: "Midnight Replay theater",
+    copy: "A dedicated replay room for live clips, audio notes, VIP reactions, and paid chapter unlocks.",
+    image: "/StarlightUI.jpg",
+    price: "$36 pass",
+    state: "Portal",
+    meta: "5 replays",
     icon: Radio,
   },
   {
@@ -160,7 +180,7 @@ const rails = [
 const quickCollections = [
   { title: "New drops", count: "8 fresh", image: "/SteamyUI.jpg", mode: "feed" as FanFrontMode },
   { title: "Unlockables", count: "21 items", image: "/BossyUI.jpg", mode: "store" as FanFrontMode },
-  { title: "Campaign room", count: "12 episodes", image: "/GloryUI.jpg", mode: "campaign" as FanFrontMode },
+  { title: "Campaign portals", count: "3 rooms", image: "/GloryUI.jpg", mode: "campaign" as FanFrontMode },
   { title: "Creator wishlist", count: "$311 funded", image: "/xanamain.jpg", mode: "feed" as FanFrontMode },
 ];
 
@@ -232,6 +252,42 @@ const storeItems = [
     metric: "Limited",
     rating: "4.7",
     duration: "34 pics",
+  },
+];
+
+const campaignPortals = [
+  {
+    title: "Aurora Week",
+    slug: "aurora-week",
+    image: "/GloryUI.jpg",
+    tagline: "Neon chapter catalog with live replays, locked galleries, and fan-voted finale paths.",
+    quote: "Every unlock is a page turn. Every fan action changes the final scene.",
+    status: "Active",
+    price: "$79 pass",
+    episodes: "12 chapters",
+    progress: 68,
+  },
+  {
+    title: "Chrome Bloom",
+    slug: "chrome-bloom",
+    image: "/SteamyUI.jpg",
+    tagline: "A reflective studio story room with set-build wishlist, stills, customs, and BTS notes.",
+    quote: "Every reflection tells a slightly different secret.",
+    status: "Funding",
+    price: "$42 pass",
+    episodes: "7 episodes",
+    progress: 74,
+  },
+  {
+    title: "Midnight Replay Theater",
+    slug: "midnight-replay",
+    image: "/StarlightUI.jpg",
+    tagline: "A replay-first portal for live clips, audio notes, fan reactions, and premium archives.",
+    quote: "The room changes once the live stream ends.",
+    status: "Replay",
+    price: "$36 pass",
+    episodes: "5 replays",
+    progress: 52,
   },
 ];
 
@@ -709,12 +765,21 @@ function FeedFront({
                         <span>{post.price}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="sm" onClick={() => setLiked((prev) => ({ ...prev, [post.title]: !prev[post.title] }))}>
-                          <Heart className={cn("size-4", liked[post.title] && "fill-fuchsia-300 text-fuchsia-300")} />
-                          {liked[post.title] ? "Loved" : "Love"}
-                        </Button>
-                        <Button variant="ghost" size="sm"><MessageCircle className="size-4" />Comment</Button>
-                        <Button variant="luxury" size="sm"><Wallet className="size-4" />Tip</Button>
+                        {post.type === "CampaignPortal" ? (
+                          <Button variant="neon" size="sm" onClick={() => setMode("campaign")}>
+                            <Radio className="size-4" />
+                            Enter
+                          </Button>
+                        ) : (
+                          <>
+                            <Button variant="ghost" size="sm" onClick={() => setLiked((prev) => ({ ...prev, [post.title]: !prev[post.title] }))}>
+                              <Heart className={cn("size-4", liked[post.title] && "fill-fuchsia-300 text-fuchsia-300")} />
+                              {liked[post.title] ? "Loved" : "Love"}
+                            </Button>
+                            <Button variant="ghost" size="sm"><MessageCircle className="size-4" />Comment</Button>
+                            <Button variant="luxury" size="sm"><Wallet className="size-4" />Tip</Button>
+                          </>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -858,21 +923,23 @@ function StoreFront({ setMode }: { setMode: (mode: FanFrontMode) => void }) {
 }
 
 function CampaignFront({ creatorId }: { creatorId: string }) {
+  const featuredPortal = campaignPortals[0];
+
   return (
     <div className="space-y-6">
       <div className="relative overflow-hidden rounded-lg border border-white/10 bg-black">
-        <Image src="/GloryUI.jpg" alt="Aurora Week campaign" fill sizes="100vw" className="object-cover opacity-65" />
+        <Image src={featuredPortal.image} alt={`${featuredPortal.title} campaign`} fill sizes="100vw" className="object-cover opacity-65" />
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(5,7,17,.96),rgba(5,7,17,.52),rgba(5,7,17,.92))]" />
         <div className="relative grid min-h-[520px] gap-6 p-6 md:p-8 lg:grid-cols-[1fr_360px] lg:items-end">
           <div>
-            <Badge variant="gold">Campaign room</Badge>
-            <h2 className="mt-4 max-w-4xl text-6xl font-bold leading-none tracking-normal sm:text-7xl">Aurora Week</h2>
+            <Badge variant="gold">CampaignPortals</Badge>
+            <h2 className="mt-4 max-w-4xl text-6xl font-bold leading-none tracking-normal sm:text-7xl">Campaign rooms</h2>
             <p className="mt-4 max-w-2xl text-white/65">
-              A storybook episode catalog for a single creator campaign: every chapter, quote, locked scene, unlocked scene,
-              replay, poll, wishlist tie-in, and store pass lives in this room.
+              Storybook episode catalogs for creator campaigns: each portal has chapters, quotes, locked scenes, unlocked
+              scenes, replays, polls, wishlist tie-ins, and store passes in one dedicated room.
             </p>
             <div className="mt-6 grid max-w-2xl grid-cols-3 gap-2">
-              {["12 drops", "5 locked", "2 live rooms"].map((stat) => (
+              {["3 portals", "24 entries", "7 locked"].map((stat) => (
                 <div key={stat} className="rounded-lg border border-white/10 bg-white/10 p-3 text-center text-sm font-semibold">{stat}</div>
               ))}
             </div>
@@ -881,9 +948,9 @@ function CampaignFront({ creatorId }: { creatorId: string }) {
             <CardContent className="p-5">
               <Quote className="size-7 text-amber-100" />
               <p className="mt-4 text-2xl font-semibold leading-snug tracking-normal">
-                "Every unlock is a page turn. Every fan action changes the final scene."
+                "{featuredPortal.quote}"
               </p>
-              <p className="mt-4 text-sm text-white/50">Creator note • Chapter room</p>
+              <p className="mt-4 text-sm text-white/50">{featuredPortal.title} • Featured portal</p>
               <Link href={`/demo/${creatorId}/feed`} className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-cyan-100">
                 Open public feed <ChevronRight className="size-4" />
               </Link>
@@ -892,10 +959,39 @@ function CampaignFront({ creatorId }: { creatorId: string }) {
         </div>
       </div>
 
+      <div className="grid gap-4 md:grid-cols-3">
+        {campaignPortals.map((portal) => (
+          <LuxuryCard key={portal.slug} className="overflow-hidden">
+            <div className="relative h-56 bg-black">
+              <Image src={portal.image} alt={portal.title} fill sizes="(min-width:768px) 33vw, 100vw" className="object-cover opacity-80" />
+              <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent,rgba(5,7,17,.9))]" />
+              <Badge variant="gold" className="absolute left-3 top-3">{portal.status}</Badge>
+              <Badge variant="luxury" className="absolute right-3 top-3">{portal.price}</Badge>
+              <div className="absolute inset-x-0 bottom-0 p-4">
+                <h3 className="text-2xl font-bold tracking-normal">{portal.title}</h3>
+                <p className="mt-1 text-sm text-white/58">{portal.episodes}</p>
+              </div>
+            </div>
+            <CardContent className="p-4">
+              <p className="text-sm leading-6 text-white/62">{portal.tagline}</p>
+              <Progress value={portal.progress} className="mt-4" />
+              <Button variant="neon" size="sm" className="mt-4 w-full">
+                <Radio className="size-4" />
+                Enter portal
+              </Button>
+            </CardContent>
+          </LuxuryCard>
+        ))}
+      </div>
+
       <div className="grid gap-4 lg:grid-cols-[280px_1fr]">
         <LuxuryCard className="h-fit lg:sticky lg:top-24">
           <CardContent className="p-5">
-            <Badge variant="neon">Room index</Badge>
+            <Badge variant="neon">Episode index</Badge>
+            <div className="mt-4 rounded-lg border border-white/10 bg-white/[0.04] p-3">
+              <p className="text-sm font-semibold">Current portal</p>
+              <p className="mt-1 text-xs text-white/50">Aurora Week storybook catalog</p>
+            </div>
             <div className="mt-4 space-y-2">
               {campaignEpisodes.map((episode, index) => (
                 <button key={episode.title} type="button" className="flex w-full items-center gap-3 rounded-lg border border-white/10 bg-white/[0.04] p-3 text-left hover:bg-white/10">
