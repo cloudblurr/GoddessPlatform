@@ -1,6 +1,5 @@
 import { ReactNode } from "react";
 import { Cormorant_Garamond, Outfit } from "next/font/google";
-import { Providers } from "./providers";
 import "./globals.css";
 
 const cormorant = Cormorant_Garamond({
@@ -18,9 +17,7 @@ const outfit = Outfit({
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" data-scroll-behavior="smooth">
-      <body className={`${cormorant.variable} ${outfit.variable}`}>
-        <Providers>{children}</Providers>
-      </body>
+      <body className={`${cormorant.variable} ${outfit.variable}`}>{children}</body>
     </html>
   );
 }

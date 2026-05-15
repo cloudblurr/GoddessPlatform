@@ -2,29 +2,12 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  Badge,
-  Box,
-  Button,
-  Flex,
-  Grid,
-  Heading,
-  HStack,
-  IconButton,
-  Input,
-  SimpleGrid,
-  Stack,
-  Text,
-  VStack,
-} from "@chakra-ui/react";
-import {
   AlertCircle,
   CheckCircle2,
   Copy,
   Download,
   Eye,
   FileText,
-  Folder,
-  Gem,
   HardDrive,
   Image as ImageIcon,
   Layers3,
@@ -41,6 +24,12 @@ import {
   Video,
   X,
 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Progress } from "@/components/ui/progress";
+import { cn } from "@/lib/utils";
 
 type R2File = {
   key: string;
@@ -58,14 +47,12 @@ type UploadState = {
   file: File;
   progress: number;
   status: "pending" | "uploading" | "done" | "error";
-  key?: string;
-  url?: string;
   error?: string;
 };
 
 type FilterTab = "all" | "video" | "image" | "audio" | "other";
 
-const TABS: { id: FilterTab; label: string }[] = [
+const tabs: { id: FilterTab; label: string }[] = [
   { id: "all", label: "All" },
   { id: "video", label: "Video" },
   { id: "image", label: "Images" },
@@ -93,38 +80,19 @@ function mediaUrlForKey(key: string) {
   return `/api/media/${encodeURIComponent(key)}?mode=redirect`;
 }
 
-function FileIcon({ name, contentType, size = 18 }: { name: string; contentType?: string; size?: number }) {
-  const cat = fileCategory(name, contentType);
-  if (cat === "video") return <Video size={size} color="#B794F4" />;
-  if (cat === "image") return <ImageIcon size={size} color="#76E4F7" />;
-  if (cat === "audio") return <Music size={size} color="#68D391" />;
-  return <FileText size={size} color="rgba(255,255,255,0.62)" />;
+function FileIcon({ file, size = 18 }: { file: Pick<R2File, "name" | "contentType">; size?: number }) {
+  const cat = fileCategory(file.name, file.contentType);
+  if (cat === "video") return <Video size={size} className="text-fuchsia-200" />;
+  if (cat === "image") return <ImageIcon size={size} className="text-cyan-200" />;
+  if (cat === "audio") return <Music size={size} className="text-emerald-200" />;
+  return <FileText size={size} className="text-white/55" />;
 }
 
-function GlassPanel({
-  children,
-  p = 5,
-  minH,
-}: {
-  children: React.ReactNode;
-  p?: number | Record<string, number>;
-  minH?: string | Record<string, string>;
-}) {
+function VaultCard({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <Box
-      p={p}
-      minH={minH}
-      border="1px solid"
-      borderColor="whiteAlpha.200"
-      bg="linear-gradient(145deg, rgba(255,255,255,0.075), rgba(255,255,255,0.025))"
-      boxShadow="0 24px 80px rgba(0,0,0,0.34)"
-      backdropFilter="blur(18px)"
-      borderRadius="2xl"
-      position="relative"
-      overflow="hidden"
-    >
+    <Card className={cn("border-white/10 bg-white/[0.055] shadow-[0_24px_80px_rgba(0,0,0,.32)] backdrop-blur-xl", className)}>
       {children}
-    </Box>
+    </Card>
   );
 }
 
@@ -144,7 +112,7 @@ export default function R2VaultManager({ configured }: { configured: boolean }) 
 
   const showToast = useCallback((msg: string, type: "ok" | "err" = "ok") => {
     setToast({ msg, type });
-    window.setTimeout(() => setToast(null), 3500);
+    window.setTimeout(() => setToast(null), 3200);
   }, []);
 
   const loadFiles = useCallback(async (p = prefix) => {
@@ -163,25 +131,15 @@ export default function R2VaultManager({ configured }: { configured: boolean }) 
   }, [prefix, showToast]);
 
   useEffect(() => {
-    if (!configured) return;
-    const timer = window.setTimeout(() => {
-      void loadFiles("");
-    }, 0);
-    return () => window.clearTimeout(timer);
+    if (configured) void loadFiles("");
   }, [configured]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const openPreview = (file: R2File) => {
-    setPreviewFile(file);
-    setRenameValue(file.name);
-  };
 
   const uploadFile = useCallback(async (file: File) => {
     const id = crypto.randomUUID();
-    setUploads(prev => [{ id, file, progress: 0, status: "pending" }, ...prev]);
+    setUploads((prev) => [{ id, file, progress: 0, status: "pending" }, ...prev]);
 
     try {
-      setUploads(prev => prev.map(u => u.id === id ? { ...u, status: "uploading", progress: 8 } : u));
-
+      setUploads((prev) => prev.map((u) => u.id === id ? { ...u, status: "uploading", progress: 8 } : u));
       const formData = new FormData();
       formData.append("file", file);
       formData.append("folder", "uploads");
@@ -191,13 +149,10 @@ export default function R2VaultManager({ configured }: { configured: boolean }) 
         xhr.upload.onprogress = (event) => {
           if (event.lengthComputable) {
             const pct = Math.round(8 + (event.loaded / event.total) * 88);
-            setUploads(prev => prev.map(u => u.id === id ? { ...u, progress: pct } : u));
+            setUploads((prev) => prev.map((u) => u.id === id ? { ...u, progress: pct } : u));
           }
         };
-        xhr.onload = () => {
-          if (xhr.status >= 200 && xhr.status < 300) resolve();
-          else reject(new Error(`Upload failed: HTTP ${xhr.status}`));
-        };
+        xhr.onload = () => xhr.status >= 200 && xhr.status < 300 ? resolve() : reject(new Error(`Upload failed: HTTP ${xhr.status}`));
         xhr.onerror = () => reject(new Error("Network error during upload"));
         xhr.open("POST", "/api/r2/upload");
         xhr.send(formData);
@@ -205,15 +160,12 @@ export default function R2VaultManager({ configured }: { configured: boolean }) 
 
       const result = JSON.parse(xhr.responseText);
       if (!result.key) throw new Error("No key returned from upload");
-
-      setUploads(prev => prev.map(u =>
-        u.id === id ? { ...u, status: "done", progress: 100, key: result.key, url: result.url ?? result.mediaUrl } : u
-      ));
+      setUploads((prev) => prev.map((u) => u.id === id ? { ...u, status: "done", progress: 100 } : u));
       showToast(`${file.name} is now in your vault`);
       await loadFiles("");
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Upload failed";
-      setUploads(prev => prev.map(u => u.id === id ? { ...u, status: "error", error: msg } : u));
+      setUploads((prev) => prev.map((u) => u.id === id ? { ...u, status: "error", error: msg } : u));
       showToast(msg, "err");
     }
   }, [loadFiles, showToast]);
@@ -223,13 +175,18 @@ export default function R2VaultManager({ configured }: { configured: boolean }) 
     Array.from(fileList).forEach(uploadFile);
   }, [uploadFile]);
 
+  const openPreview = (file: R2File) => {
+    setPreviewFile(file);
+    setRenameValue(file.name);
+  };
+
   const deleteFile = async (file: R2File) => {
     if (!confirm(`Delete "${file.name}" from the vault? This cannot be undone.`)) return;
     try {
       const res = await fetch(`/api/r2/files/${encodeURIComponent(file.key)}`, { method: "DELETE" });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Delete failed");
-      setFiles(prev => prev.filter(item => item.key !== file.key));
+      setFiles((prev) => prev.filter((item) => item.key !== file.key));
       if (previewFile?.key === file.key) setPreviewFile(null);
       showToast(`${file.name} deleted`);
     } catch (err) {
@@ -271,7 +228,7 @@ export default function R2VaultManager({ configured }: { configured: boolean }) 
   };
 
   const filtered = useMemo(() => {
-    return files.filter(file => {
+    return files.filter((file) => {
       if (file.isFolder) return true;
       if (filter !== "all" && fileCategory(file.name, file.contentType) !== filter) return false;
       if (query && !file.name.toLowerCase().includes(query.toLowerCase())) return false;
@@ -279,386 +236,269 @@ export default function R2VaultManager({ configured }: { configured: boolean }) 
     });
   }, [files, filter, query]);
 
-  const fileItems = files.filter(file => !file.isFolder);
+  const fileItems = files.filter((file) => !file.isFolder);
   const totalSize = fileItems.reduce((sum, file) => sum + file.size, 0);
-  const videoCount = fileItems.filter(file => fileCategory(file.name, file.contentType) === "video").length;
-  const imageCount = fileItems.filter(file => fileCategory(file.name, file.contentType) === "image").length;
-  const latestFile = fileItems
-    .slice()
-    .sort((a, b) => new Date(b.lastModified).getTime() - new Date(a.lastModified).getTime())[0];
+  const videoCount = fileItems.filter((file) => fileCategory(file.name, file.contentType) === "video").length;
+  const imageCount = fileItems.filter((file) => fileCategory(file.name, file.contentType) === "image").length;
 
   if (!configured) {
     return (
-      <GlassPanel p={{ base: 5, md: 8 }}>
-        <Stack gap={5}>
-          <HStack gap={3}>
-            <AlertCircle size={26} color="#F6E05E" />
-            <Box>
-              <Heading size="lg" color="white" letterSpacing="0">R2 Credentials Required</Heading>
-              <Text color="whiteAlpha.700">Add your Cloudflare R2 credentials to enable persistent creator storage.</Text>
-            </Box>
-          </HStack>
-          <Box borderRadius="xl" bg="blackAlpha.500" border="1px solid" borderColor="whiteAlpha.200" p={4} fontFamily="mono" fontSize="sm" color="whiteAlpha.800">
-            <Text color="whiteAlpha.500"># Add these to your .env file</Text>
-            <Text>R2_ACCESS_KEY_ID=your_access_key</Text>
-            <Text>R2_SECRET_ACCESS_KEY=your_secret_key</Text>
-            <Text>R2_BUCKET_NAME=xanna-media</Text>
-            <Text>R2_ENDPOINT=https://&lt;account_id&gt;.r2.cloudflarestorage.com</Text>
-          </Box>
-        </Stack>
-      </GlassPanel>
+      <VaultCard>
+        <CardContent className="p-6 md:p-8">
+          <div className="flex gap-4">
+            <AlertCircle className="mt-1 size-7 text-amber-200" />
+            <div>
+              <h2 className="text-2xl font-semibold tracking-normal">R2 Credentials Required</h2>
+              <p className="mt-2 text-white/62">Add your Cloudflare R2 credentials to enable persistent creator storage.</p>
+              <pre className="mt-5 overflow-auto rounded-lg border border-white/10 bg-black/45 p-4 text-sm text-white/70">
+{`R2_ACCESS_KEY_ID=your_access_key
+R2_SECRET_ACCESS_KEY=your_secret_key
+R2_BUCKET_NAME=xanna-media
+R2_ENDPOINT=https://<account_id>.r2.cloudflarestorage.com`}
+              </pre>
+            </div>
+          </div>
+        </CardContent>
+      </VaultCard>
     );
   }
 
   return (
-    <Box position="relative">
-      {toast ? (
-        <HStack
-          position="fixed"
-          right={6}
-          bottom={6}
-          zIndex={50}
-          borderRadius="xl"
-          px={4}
-          py={3}
-          bg={toast.type === "ok" ? "rgba(4, 120, 87, 0.92)" : "rgba(127, 29, 29, 0.92)"}
-          border="1px solid"
-          borderColor={toast.type === "ok" ? "green.300/40" : "red.300/40"}
-          color="white"
-          boxShadow="0 20px 60px rgba(0,0,0,0.35)"
-        >
-          {toast.type === "ok" ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
-          <Text fontSize="sm" fontWeight="700">{toast.msg}</Text>
-        </HStack>
-      ) : null}
+    <div className="relative space-y-6">
+      {toast && (
+        <div className={cn("fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-lg border px-4 py-3 text-sm font-semibold text-white shadow-2xl backdrop-blur", toast.type === "ok" ? "border-emerald-300/30 bg-emerald-950/90" : "border-red-300/30 bg-red-950/90")}>
+          {toast.type === "ok" ? <CheckCircle2 className="size-4" /> : <AlertCircle className="size-4" />}
+          {toast.msg}
+        </div>
+      )}
 
-      <Stack gap={6}>
-        <Grid templateColumns={{ base: "1fr", xl: "1.08fr 0.92fr" }} gap={6}>
-          <GlassPanel minH="360px" p={{ base: 5, md: 7 }}>
-            <Box
-              position="absolute"
-              inset={0}
-              bg="radial-gradient(circle at 15% 18%, rgba(201,168,76,0.18), transparent 26rem), radial-gradient(circle at 95% 20%, rgba(118,228,247,0.16), transparent 26rem)"
-              pointerEvents="none"
-            />
-            <Stack gap={6} position="relative">
-              <HStack gap={3} flexWrap="wrap">
-                <Badge borderRadius="full" px={3} py={1} bg="whiteAlpha.200" color="yellow.100">Cloudflare R2</Badge>
-                <Badge borderRadius="full" px={3} py={1} bg="green.400/20" color="green.100">Persistent until deleted</Badge>
-              </HStack>
-              <Box>
-                <Text color="#F6E05E" textTransform="uppercase" letterSpacing="0.22em" fontSize="xs" fontWeight="900">
-                  Creator Vault
-                </Text>
-                <Heading mt={3} color="white" fontSize={{ base: "3.5rem", md: "5.7rem" }} lineHeight="0.82" letterSpacing="0">
-                  Your media palace.
-                </Heading>
-                <Text mt={4} color="whiteAlpha.800" maxW="720px" fontSize={{ base: "md", md: "lg" }}>
-                  Upload raw drops, polish store assets, preview locked media, rename files, copy secure links, download masters, and delete only when you decide.
-                </Text>
-              </Box>
-              <SimpleGrid columns={{ base: 1, md: 4 }} gap={3}>
+      <div className="grid gap-6 xl:grid-cols-[1.1fr_.9fr]">
+        <VaultCard className="overflow-hidden">
+          <CardContent className="relative p-6 md:p-8">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_18%,rgba(246,211,101,.16),transparent_24rem),radial-gradient(circle_at_95%_20%,rgba(20,241,217,.14),transparent_24rem)]" />
+            <div className="relative">
+              <div className="flex flex-wrap gap-2">
+                <Badge variant="gold">Cloudflare R2</Badge>
+                <Badge variant="neon">Persistent until deleted</Badge>
+                <Badge variant="luxury"><ShieldCheck className="size-3" />Creator scoped</Badge>
+              </div>
+              <h1 className="mt-5 max-w-3xl text-5xl font-bold leading-none tracking-normal md:text-7xl">Creator media vault</h1>
+              <p className="mt-4 max-w-3xl text-white/65">
+                Upload raw drops, store-only products, locked campaign assets, custom deliveries, preview masters,
+                rename files, copy secure URLs, download originals, and delete content only when you choose.
+              </p>
+              <div className="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                 {[
                   { label: "Files", value: fileItems.length.toLocaleString(), icon: Layers3 },
                   { label: "Stored", value: formatBytes(totalSize), icon: HardDrive },
                   { label: "Video", value: videoCount.toLocaleString(), icon: Video },
                   { label: "Images", value: imageCount.toLocaleString(), icon: ImageIcon },
                 ].map(({ label, value, icon: Icon }) => (
-                  <Box key={label} p={4} borderRadius="xl" bg="blackAlpha.400" border="1px solid" borderColor="whiteAlpha.200">
-                    <Icon size={18} color="#F6E05E" />
-                    <Text mt={3} color="white" fontSize="2xl" fontWeight="900">{value}</Text>
-                    <Text color="whiteAlpha.600" fontSize="xs" textTransform="uppercase" letterSpacing="0.12em">{label}</Text>
-                  </Box>
+                  <div key={label} className="rounded-lg border border-white/10 bg-black/30 p-4">
+                    <Icon className="size-5 text-amber-100" />
+                    <p className="mt-3 text-2xl font-bold">{value}</p>
+                    <p className="text-xs font-semibold uppercase tracking-[.12em] text-white/45">{label}</p>
+                  </div>
                 ))}
-              </SimpleGrid>
-            </Stack>
-          </GlassPanel>
+              </div>
+            </div>
+          </CardContent>
+        </VaultCard>
 
-          <Box
-            borderRadius="2xl"
-            border="1px dashed"
-            borderColor={dragActive ? "#F6E05E" : "whiteAlpha.300"}
-            bg={dragActive ? "rgba(246,224,94,0.12)" : "rgba(255,255,255,0.045)"}
-            p={{ base: 5, md: 7 }}
-            display="grid"
-            placeItems="center"
-            minH="360px"
-            cursor="pointer"
-            transition="all 180ms ease"
-            onClick={() => fileInputRef.current?.click()}
-            onDrop={(event) => {
-              event.preventDefault();
-              setDragActive(false);
-              handleFiles(event.dataTransfer.files);
-            }}
-            onDragOver={(event) => {
-              event.preventDefault();
-              setDragActive(true);
-            }}
-            onDragLeave={() => setDragActive(false)}
-          >
-            <input
-              ref={fileInputRef}
-              type="file"
-              multiple
-              hidden
-              onChange={event => handleFiles(event.target.files)}
-            />
-            <VStack gap={5} textAlign="center">
-              <Box w="92px" h="92px" borderRadius="full" display="grid" placeItems="center" bg="linear-gradient(135deg, #F6E05E, #F687B3)" color="black" boxShadow="0 0 46px rgba(246,224,94,0.28)">
-                <UploadCloud size={38} />
-              </Box>
-              <Box>
-                <Heading size="xl" color="white" letterSpacing="0">Drop content into R2</Heading>
-                <Text mt={2} color="whiteAlpha.700">Video, images, audio, product assets, custom deliveries, and campaign files.</Text>
-              </Box>
-              <Button borderRadius="full" bg="white" color="black" fontWeight="900" px={6}>
-                <Sparkles size={18} />
-                Select Files
-              </Button>
-            </VStack>
-          </Box>
-        </Grid>
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          onDrop={(event) => {
+            event.preventDefault();
+            setDragActive(false);
+            handleFiles(event.dataTransfer.files);
+          }}
+          onDragOver={(event) => {
+            event.preventDefault();
+            setDragActive(true);
+          }}
+          onDragLeave={() => setDragActive(false)}
+          className={cn("grid min-h-[340px] place-items-center rounded-lg border border-dashed p-6 text-center transition", dragActive ? "border-amber-200 bg-amber-200/10" : "border-white/20 bg-white/[0.045] hover:bg-white/[0.07]")}
+        >
+          <input ref={fileInputRef} type="file" multiple hidden onChange={(event) => handleFiles(event.target.files)} />
+          <div className="max-w-md">
+            <div className="mx-auto grid size-24 place-items-center rounded-full bg-[linear-gradient(135deg,#f6d365,#f43f8f)] text-black shadow-[0_0_46px_rgba(246,211,101,.28)]">
+              <UploadCloud className="size-10" />
+            </div>
+            <h2 className="mt-5 text-3xl font-semibold tracking-normal">Drop content into R2</h2>
+            <p className="mt-2 text-white/60">Video, images, audio, product assets, custom deliveries, and campaign files.</p>
+            <span className="mt-5 inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-bold text-black">
+              <Sparkles className="size-4" />
+              Select files
+            </span>
+          </div>
+        </button>
+      </div>
 
-        {uploads.length > 0 ? (
-          <GlassPanel>
-            <Flex align="center" justify="space-between" mb={4}>
-              <Heading size="md" color="white" letterSpacing="0">Upload Queue</Heading>
-              <Button size="sm" borderRadius="full" bg="whiteAlpha.100" color="white" onClick={() => setUploads(prev => prev.filter(item => item.status === "uploading" || item.status === "pending"))}>
+      {uploads.length > 0 && (
+        <VaultCard>
+          <CardContent className="p-5">
+            <div className="flex items-center justify-between gap-4">
+              <h2 className="text-xl font-semibold tracking-normal">Upload queue</h2>
+              <Button variant="luxury" size="sm" onClick={() => setUploads((prev) => prev.filter((item) => item.status === "uploading" || item.status === "pending"))}>
                 Clear finished
               </Button>
-            </Flex>
-            <Stack gap={3}>
-              {uploads.map(upload => (
-                <Box key={upload.id} borderRadius="xl" bg="blackAlpha.300" border="1px solid" borderColor="whiteAlpha.200" p={4}>
-                  <HStack justify="space-between" gap={4}>
-                    <HStack minW={0}>
-                      <FileIcon name={upload.file.name} />
-                      <Box minW={0}>
-                        <Text color="white" fontWeight="800" truncate>{upload.file.name}</Text>
-                        <Text color="whiteAlpha.500" fontSize="xs">{formatBytes(upload.file.size)}</Text>
-                      </Box>
-                    </HStack>
-                    <HStack>
-                      {upload.status === "uploading" ? <Loader2 size={16} className="animate-spin" color="#F6E05E" /> : null}
-                      {upload.status === "done" ? <CheckCircle2 size={16} color="#68D391" /> : null}
-                      {upload.status === "error" ? <AlertCircle size={16} color="#FC8181" /> : null}
-                      <IconButton aria-label="Remove upload" size="sm" borderRadius="full" bg="whiteAlpha.100" color="white" onClick={() => setUploads(prev => prev.filter(item => item.id !== upload.id))}>
-                        <X size={14} />
-                      </IconButton>
-                    </HStack>
-                  </HStack>
-                  <Box mt={3} h="7px" borderRadius="full" bg="whiteAlpha.200" overflow="hidden">
-                    <Box h="full" w={`${upload.progress}%`} bg={upload.status === "error" ? "#FC8181" : upload.status === "done" ? "#68D391" : "linear-gradient(90deg, #F6E05E, #F687B3)"} />
-                  </Box>
-                  {upload.error ? <Text mt={2} color="red.200" fontSize="xs">{upload.error}</Text> : null}
-                </Box>
+            </div>
+            <div className="mt-4 grid gap-3">
+              {uploads.map((upload) => (
+                <div key={upload.id} className="rounded-lg border border-white/10 bg-black/25 p-4">
+                  <div className="flex items-center gap-3">
+                    <FileIcon file={{ name: upload.file.name }} />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-semibold">{upload.file.name}</p>
+                      <p className="text-xs text-white/45">{formatBytes(upload.file.size)}</p>
+                    </div>
+                    {upload.status === "uploading" && <Loader2 className="size-4 animate-spin text-amber-100" />}
+                    {upload.status === "done" && <CheckCircle2 className="size-4 text-emerald-200" />}
+                    {upload.status === "error" && <AlertCircle className="size-4 text-red-200" />}
+                    <Button variant="ghost" size="icon" onClick={() => setUploads((prev) => prev.filter((item) => item.id !== upload.id))}>
+                      <X className="size-4" />
+                    </Button>
+                  </div>
+                  <Progress value={upload.progress} className="mt-3" />
+                  {upload.error && <p className="mt-2 text-xs text-red-200">{upload.error}</p>}
+                </div>
               ))}
-            </Stack>
-          </GlassPanel>
-        ) : null}
+            </div>
+          </CardContent>
+        </VaultCard>
+      )}
 
-        <Grid templateColumns={{ base: "1fr", xl: "minmax(0, 1fr) 380px" }} gap={6} alignItems="start">
-          <GlassPanel>
-            <Flex align={{ base: "start", md: "center" }} justify="space-between" direction={{ base: "column", md: "row" }} gap={4} mb={5}>
-              <Box>
-                <Heading size="xl" color="white" letterSpacing="0">Uploaded Content</Heading>
-                <Text color="whiteAlpha.600">This list is loaded from Cloudflare R2 and remains until a creator deletes it.</Text>
-              </Box>
-              <HStack gap={2} flexWrap="wrap">
-                <Box position="relative">
-                  <Search size={16} color="rgba(255,255,255,0.45)" style={{ position: "absolute", left: 14, top: 13, zIndex: 1 }} />
-                  <Input value={query} onChange={event => setQuery(event.target.value)} placeholder="Search vault" pl={10} borderRadius="full" bg="blackAlpha.300" borderColor="whiteAlpha.300" color="white" />
-                </Box>
-                <IconButton aria-label="Refresh R2 files" borderRadius="full" bg="whiteAlpha.100" color="white" onClick={() => loadFiles(prefix)}>
-                  <RefreshCcw size={16} className={loading ? "animate-spin" : ""} />
-                </IconButton>
-              </HStack>
-            </Flex>
+      <VaultCard>
+        <CardContent className="p-5">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <h2 className="text-2xl font-semibold tracking-normal">Uploaded content</h2>
+              <p className="text-sm text-white/52">Everything listed here persists in R2 until you delete it.</p>
+            </div>
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <div className="relative">
+                <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-white/40" />
+                <Input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search vault" className="pl-9 sm:w-72" />
+              </div>
+              <Button variant="luxury" onClick={() => void loadFiles(prefix)} disabled={loading}>
+                <RefreshCcw className={cn("size-4", loading && "animate-spin")} />
+                Refresh
+              </Button>
+            </div>
+          </div>
 
-            <HStack gap={2} flexWrap="wrap" mb={5}>
-              {TABS.map(tab => (
-                <Button
-                  key={tab.id}
-                  size="sm"
-                  borderRadius="full"
-                  bg={filter === tab.id ? "white" : "whiteAlpha.100"}
-                  color={filter === tab.id ? "black" : "whiteAlpha.800"}
-                  onClick={() => setFilter(tab.id)}
-                  _hover={{ bg: filter === tab.id ? "white" : "whiteAlpha.200" }}
-                >
-                  {tab.label}
-                </Button>
-              ))}
-            </HStack>
+          <div className="mt-5 flex flex-wrap gap-2">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setFilter(tab.id)}
+                className={cn("rounded-full border px-4 py-2 text-sm font-semibold transition", filter === tab.id ? "border-white bg-white text-black" : "border-white/10 bg-white/[0.055] text-white/62 hover:text-white")}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
 
-            {loading ? (
-              <HStack py={12} color="whiteAlpha.600">
-                <Loader2 size={18} className="animate-spin" />
-                <Text>Loading your R2 vault...</Text>
-              </HStack>
-            ) : filtered.length === 0 ? (
-              <VStack py={16} color="whiteAlpha.500">
-                <Gem size={40} />
-                <Text>No content matches this view yet.</Text>
-              </VStack>
-            ) : (
-              <SimpleGrid columns={{ base: 1, md: 2 }} gap={4}>
-                {filtered.map(file => (
-                  <Box
-                    key={file.key}
-                    borderRadius="2xl"
-                    bg="blackAlpha.300"
-                    border="1px solid"
-                    borderColor={previewFile?.key === file.key ? "#F6E05E" : "whiteAlpha.200"}
-                    overflow="hidden"
-                    transition="all 180ms ease"
-                    _hover={{ borderColor: "whiteAlpha.400", transform: "translateY(-2px)" }}
-                  >
-                    <Box position="relative" h="180px" bg="rgba(255,255,255,0.04)" cursor="pointer" onClick={() => file.isFolder ? loadFiles(file.key) : openPreview(file)}>
-                      {file.isFolder ? (
-                        <VStack h="full" justify="center">
-                          <Folder size={42} color="#F6E05E" />
-                          <Text color="whiteAlpha.700">Folder</Text>
-                        </VStack>
-                      ) : fileCategory(file.name, file.contentType) === "image" ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={mediaUrlForKey(file.key)} alt={file.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                      ) : (
-                        <VStack h="full" justify="center">
-                          <FileIcon name={file.name} contentType={file.contentType} size={44} />
-                          <Badge borderRadius="full" bg="whiteAlpha.200" color="white">{fileCategory(file.name, file.contentType)}</Badge>
-                        </VStack>
-                      )}
-                      {!file.isFolder ? (
-                        <Badge position="absolute" top={3} left={3} borderRadius="full" px={3} py={1} bg="blackAlpha.700" color="white">
-                          {formatBytes(file.size)}
-                        </Badge>
-                      ) : null}
-                    </Box>
-                    <Stack p={4} gap={3}>
-                      <Box>
-                        <Text color="white" fontWeight="900" truncate>{file.name}</Text>
-                        <Text color="whiteAlpha.500" fontSize="xs" truncate>{file.key}</Text>
-                      </Box>
-                      {!file.isFolder ? (
-                        <HStack justify="space-between">
-                          <Text color="whiteAlpha.500" fontSize="xs">
-                            {file.lastModified ? new Date(file.lastModified).toLocaleDateString() : "R2 object"}
-                          </Text>
-                          <HStack gap={1}>
-                            <IconButton aria-label="Preview file" size="sm" borderRadius="full" bg="whiteAlpha.100" color="white" onClick={() => openPreview(file)}>
-                              <Eye size={14} />
-                            </IconButton>
-                            <IconButton aria-label="Copy secure URL" size="sm" borderRadius="full" bg="whiteAlpha.100" color="white" onClick={() => copyUrl(file)}>
-                              <Copy size={14} />
-                            </IconButton>
-                            <IconButton aria-label="Delete file" size="sm" borderRadius="full" bg="red.400/15" color="red.100" onClick={() => deleteFile(file)}>
-                              <Trash2 size={14} />
-                            </IconButton>
-                          </HStack>
-                        </HStack>
-                      ) : null}
-                    </Stack>
-                  </Box>
-                ))}
-              </SimpleGrid>
-            )}
-          </GlassPanel>
+          <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {filtered.map((file) => {
+              const category = fileCategory(file.name, file.contentType);
+              return (
+                <div key={file.key} className="group overflow-hidden rounded-lg border border-white/10 bg-black/24">
+                  <button type="button" onClick={() => openPreview(file)} className="relative block h-48 w-full overflow-hidden bg-white/[0.045] text-left">
+                    {category === "image" ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={mediaUrlForKey(file.key)} alt={file.name} className="size-full object-cover transition duration-500 group-hover:scale-105" />
+                    ) : category === "video" ? (
+                      <video src={mediaUrlForKey(file.key)} className="size-full object-cover opacity-80" muted playsInline />
+                    ) : (
+                      <div className="grid size-full place-items-center">
+                        <FileIcon file={file} size={42} />
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent,rgba(0,0,0,.72))]" />
+                    <Badge variant="luxury" className="absolute left-3 top-3">{category}</Badge>
+                    <span className="absolute bottom-3 left-3 right-3 truncate text-sm font-semibold">{file.name}</span>
+                  </button>
+                  <div className="p-4">
+                    <div className="flex items-center justify-between gap-3 text-xs text-white/45">
+                      <span>{formatBytes(file.size)}</span>
+                      <span>{new Date(file.lastModified).toLocaleDateString()}</span>
+                    </div>
+                    <div className="mt-4 grid grid-cols-4 gap-2">
+                      <Button variant="luxury" size="icon" aria-label="Preview" onClick={() => openPreview(file)}><Eye className="size-4" /></Button>
+                      <Button variant="luxury" size="icon" aria-label="Copy URL" onClick={() => void copyUrl(file)}><Copy className="size-4" /></Button>
+                      <Button variant="luxury" size="icon" aria-label="Download" onClick={() => window.open(mediaUrlForKey(file.key), "_blank")}><Download className="size-4" /></Button>
+                      <Button variant="destructive" size="icon" aria-label="Delete" onClick={() => void deleteFile(file)}><Trash2 className="size-4" /></Button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
 
-          <GlassPanel minH="620px">
-            {previewFile ? (
-              <Stack gap={5}>
-                <Flex justify="space-between" align="start" gap={3}>
-                  <Box minW={0}>
-                    <Text color="#F6E05E" textTransform="uppercase" letterSpacing="0.18em" fontSize="xs" fontWeight="900">Inspector</Text>
-                    <Heading mt={2} color="white" size="lg" letterSpacing="0" truncate>{previewFile.name}</Heading>
-                  </Box>
-                  <IconButton aria-label="Close preview" borderRadius="full" bg="whiteAlpha.100" color="white" onClick={() => setPreviewFile(null)}>
-                    <X size={16} />
-                  </IconButton>
-                </Flex>
+          {filtered.length === 0 && (
+            <div className="grid min-h-64 place-items-center text-center">
+              <div>
+                <Layers3 className="mx-auto size-10 text-white/30" />
+                <p className="mt-4 font-semibold">No uploaded content found</p>
+                <p className="mt-1 text-sm text-white/45">Upload files above or adjust your filters.</p>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </VaultCard>
 
-                <Box borderRadius="xl" overflow="hidden" bg="blackAlpha.500" border="1px solid" borderColor="whiteAlpha.200" minH="230px" display="grid" placeItems="center">
-                  {fileCategory(previewFile.name, previewFile.contentType) === "image" ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={mediaUrlForKey(previewFile.key)} alt={previewFile.name} style={{ width: "100%", maxHeight: 360, objectFit: "contain" }} />
-                  ) : null}
-                  {fileCategory(previewFile.name, previewFile.contentType) === "video" ? (
-                    <video src={mediaUrlForKey(previewFile.key)} controls preload="metadata" style={{ width: "100%" }} />
-                  ) : null}
-                  {fileCategory(previewFile.name, previewFile.contentType) === "audio" ? (
-                    <Box p={6} w="full"><audio src={mediaUrlForKey(previewFile.key)} controls preload="metadata" style={{ width: "100%" }} /></Box>
-                  ) : null}
-                  {fileCategory(previewFile.name, previewFile.contentType) === "other" ? (
-                    <VStack py={12}>
-                      <FileIcon name={previewFile.name} contentType={previewFile.contentType} size={42} />
-                      <Text color="whiteAlpha.600">Preview unavailable</Text>
-                    </VStack>
-                  ) : null}
-                </Box>
-
-                <Stack gap={3}>
-                  <Text color="whiteAlpha.700" fontSize="sm" fontWeight="800">Rename file</Text>
-                  <HStack>
-                    <Input value={renameValue} onChange={event => setRenameValue(event.target.value)} borderRadius="full" bg="blackAlpha.300" borderColor="whiteAlpha.300" color="white" />
-                    <IconButton aria-label="Rename file" borderRadius="full" bg="white" color="black" loading={renaming} onClick={renameFile}>
-                      <Pencil size={16} />
-                    </IconButton>
-                  </HStack>
-                </Stack>
-
-                <SimpleGrid columns={2} gap={3}>
-                  <Box p={3} borderRadius="xl" bg="whiteAlpha.100">
-                    <Text color="whiteAlpha.500" fontSize="xs">Size</Text>
-                    <Text color="white" fontWeight="900">{formatBytes(previewFile.size)}</Text>
-                  </Box>
-                  <Box p={3} borderRadius="xl" bg="whiteAlpha.100">
-                    <Text color="whiteAlpha.500" fontSize="xs">Type</Text>
-                    <Text color="white" fontWeight="900" textTransform="capitalize">{fileCategory(previewFile.name, previewFile.contentType)}</Text>
-                  </Box>
-                  <Box p={3} borderRadius="xl" bg="whiteAlpha.100" gridColumn="1 / -1">
-                    <Text color="whiteAlpha.500" fontSize="xs">R2 key</Text>
-                    <Text color="yellow.100" fontSize="xs" wordBreak="break-all">{previewFile.key}</Text>
-                  </Box>
-                </SimpleGrid>
-
-                <Stack gap={2}>
-                  <Button borderRadius="full" bg="white" color="black" fontWeight="900" onClick={() => copyUrl(previewFile)}>
-                    <Link2 size={16} />
-                    Copy Secure URL
-                  </Button>
-                  <Button asChild borderRadius="full" bg="whiteAlpha.100" color="white" border="1px solid" borderColor="whiteAlpha.200">
-                    <a href={mediaUrlForKey(previewFile.key)} target="_blank" rel="noreferrer">
-                      <Download size={16} />
-                      Download / Open
-                    </a>
-                  </Button>
-                  <Button borderRadius="full" bg="red.400/15" color="red.100" onClick={() => deleteFile(previewFile)}>
-                    <Trash2 size={16} />
-                    Delete from R2
-                  </Button>
-                </Stack>
-              </Stack>
-            ) : (
-              <VStack h="full" minH="560px" justify="center" textAlign="center" color="whiteAlpha.650" gap={5}>
-                <Box w="76px" h="76px" borderRadius="full" display="grid" placeItems="center" bg="whiteAlpha.100" color="yellow.100">
-                  <ShieldCheck size={30} />
-                </Box>
-                <Box>
-                  <Heading size="lg" color="white" letterSpacing="0">Select a vault item</Heading>
-                  <Text mt={2}>Preview media, rename objects, copy links, download masters, or remove files from R2.</Text>
-                </Box>
-                {latestFile ? (
-                  <Button borderRadius="full" bg="whiteAlpha.100" color="white" onClick={() => openPreview(latestFile)}>
-                    Inspect Latest Upload
-                  </Button>
-                ) : null}
-              </VStack>
-            )}
-          </GlassPanel>
-        </Grid>
-      </Stack>
-    </Box>
+      {previewFile && (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-black/70 p-4 backdrop-blur">
+          <div className="max-h-[92vh] w-full max-w-4xl overflow-auto rounded-lg border border-white/12 bg-[#080b16] shadow-2xl">
+            <div className="flex items-center justify-between gap-4 border-b border-white/10 p-4">
+              <div className="min-w-0">
+                <p className="truncate font-semibold">{previewFile.name}</p>
+                <p className="text-xs text-white/45">{previewFile.key}</p>
+              </div>
+              <Button variant="ghost" size="icon" onClick={() => setPreviewFile(null)}><X className="size-5" /></Button>
+            </div>
+            <div className="grid gap-0 lg:grid-cols-[1fr_320px]">
+              <div className="grid min-h-[420px] place-items-center bg-black">
+                {fileCategory(previewFile.name, previewFile.contentType) === "image" ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={mediaUrlForKey(previewFile.key)} alt={previewFile.name} className="max-h-[70vh] w-full object-contain" />
+                ) : fileCategory(previewFile.name, previewFile.contentType) === "video" ? (
+                  <video src={mediaUrlForKey(previewFile.key)} className="max-h-[70vh] w-full" controls />
+                ) : fileCategory(previewFile.name, previewFile.contentType) === "audio" ? (
+                  <audio src={mediaUrlForKey(previewFile.key)} controls className="w-4/5" />
+                ) : (
+                  <FileIcon file={previewFile} size={72} />
+                )}
+              </div>
+              <aside className="space-y-4 p-5">
+                <Badge variant="neon">Vault inspector</Badge>
+                <div>
+                  <label className="text-xs font-semibold uppercase tracking-[.14em] text-white/45">Rename file</label>
+                  <div className="mt-2 flex gap-2">
+                    <Input value={renameValue} onChange={(event) => setRenameValue(event.target.value)} />
+                    <Button variant="neon" size="icon" disabled={renaming} onClick={() => void renameFile()}>
+                      {renaming ? <Loader2 className="size-4 animate-spin" /> : <Pencil className="size-4" />}
+                    </Button>
+                  </div>
+                </div>
+                <div className="rounded-lg border border-white/10 bg-white/[0.045] p-4 text-sm text-white/60">
+                  <p><span className="text-white">Size:</span> {formatBytes(previewFile.size)}</p>
+                  <p><span className="text-white">Type:</span> {previewFile.contentType ?? fileCategory(previewFile.name)}</p>
+                  <p><span className="text-white">Modified:</span> {new Date(previewFile.lastModified).toLocaleString()}</p>
+                </div>
+                <div className="grid gap-2">
+                  <Button variant="luxury" onClick={() => void copyUrl(previewFile)}><Link2 className="size-4" />Copy secure URL</Button>
+                  <Button variant="luxury" onClick={() => window.open(mediaUrlForKey(previewFile.key), "_blank")}><Download className="size-4" />Open / download</Button>
+                  <Button variant="destructive" onClick={() => void deleteFile(previewFile)}><Trash2 className="size-4" />Delete from R2</Button>
+                </div>
+              </aside>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

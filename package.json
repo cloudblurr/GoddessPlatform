@@ -14,8 +14,6 @@
     "@aws-sdk/client-s3": "3.758.0",
     "@aws-sdk/s3-request-presigner": "3.758.0",
     "@base-ui/react": "^1.4.1",
-    "@chakra-ui/react": "^3.35.0",
-    "@emotion/react": "^11.14.0",
     "@supabase/supabase-js": "^2.105.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
