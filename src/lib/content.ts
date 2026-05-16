@@ -38,22 +38,22 @@ export type ScrollThread = {
 /* ── Creator identity ─────────────────────────────────── */
 
 export const creatorProfile = {
-  name: "Goddess Annalesse",
-  tagline: "Welcome to the divine sanctum. Stay as long as you like.",
+  name: "Xanna",
+  tagline: "Exclusive content. Direct connection. Your backstage pass to the creator experience.",
   memberCount: "4,200",
-  bio: "Ethereal nights, golden light, and secrets whispered behind platinum gates. Exclusive visuals, intimate moments, and premium drops from inside the sanctum.",
+  bio: "Behind-the-scenes access, exclusive content, and direct connection with me. This is where the real content lives — unfiltered, authentic, and made just for my subscribers.",
   teaserLines: [
-    "Daily posts in the Heavens — personal, intimate, real",
-    "Private reserves locked in the Vault",
-    "Live evenings on the Celestial Terrace",
-    "Sealed letters and divine voice notes just for you",
+    "Daily exclusive posts and updates",
+    "Behind-the-scenes content and b-roll",
+    "Direct messaging and Q&A sessions",
+    "Early access to new releases and drops",
   ],
   collageQuotes: [
-    { text: "\"Every photo is a divine confession of how badly I want you to look… and touch.\"", label: "Philosophy" },
-    { text: "\"I built this sanctum so you could see every inch of me I don’t show anyone else… and beg for more.\"", label: "Bio" },
-    { text: "\"Golden hour is a state of mind… when my skin glows and my aura intoxicates.\"", label: "Saying" },
-    { text: "Born somewhere warm. Lives in the light, always dripping in platinum.", label: "About" },
-    { text: "\"The best things happen after sunset… when the halos come off.\"", label: "Mood" },
+    { text: "This is where I share everything I don't post anywhere else.", label: "Philosophy" },
+    { text: "Built this platform to give my subscribers the real, unfiltered experience.", label: "Mission" },
+    { text: "Authentic content, direct connection, no gatekeepers.", label: "Approach" },
+    { text: "Creating daily. Sharing exclusively. Connecting directly.", label: "About" },
+    { text: "The best content is reserved for those who are truly here.", label: "Mood" },
   ],
 };
 
@@ -62,23 +62,23 @@ export const creatorProfile = {
 export const pricingPlans = [
   {
     id: "monthly" as const,
-    label: "Exclusive Access",
+    label: "Creator Access",
     subtitle: "Monthly Membership",
     price: "$15.99",
     period: "/mo",
-    perks: ["Full content feed access", "Direct messaging", "Vault browsing", "Live session access"],
+    perks: ["Full content feed access", "Direct messaging with creator", "Exclusive media vault", "Behind-the-scenes content", "Early access to releases"],
     highlight: true,
   },
 ];
 
-/* ── El Jardín Feed posts ─────────────────────────────── */
+/* ── Feed posts ─────────────────────────────── */
 
 export const feedItems: ContentItem[] = [
   {
     id: "feed-golden-hour",
-    title: "Golden Hour on the Terrace",
-    description: "Caught this light just before the sun dipped behind the hills. No filter, just warmth.",
-    mood: "Personal",
+    title: "Behind the Scenes: Studio Session",
+    description: "Exclusive look at today's studio session. See how the content gets made.",
+    mood: "BTS",
     access: "subscription",
     pinned: true,
     thumb: ["#8b5e3c", "#3d2a1e"],
@@ -88,8 +88,8 @@ export const feedItems: ContentItem[] = [
   },
   {
     id: "feed-bts-courtyard",
-    title: "Behind the Courtyard Shoot",
-    description: "How we turned an old stone wall into the backdrop for the new collection.",
+    title: "Content Creation Process",
+    description: "How I plan and create content for the platform. A peek behind the curtain.",
     mood: "BTS",
     access: "subscription",
     thumb: ["#6b4423", "#2e1e15"],
@@ -100,11 +100,10 @@ export const feedItems: ContentItem[] = [
   },
   {
     id: "feed-velvet-night",
-    title: "Velvet Night (Extended Cut)",
-    description: "The full uncut reel from the candlelit evening session.",
-    mood: "PPV",
-    access: "ppv",
-    priceCents: 700,
+    title: "Exclusive Extended Cut",
+    description: "The full uncut version of today's premium content. Available to subscribers.",
+    mood: "Exclusive",
+    access: "subscription",
     thumb: ["#5c2e1a", "#1a0f0a"],
     likes: 189,
     comments: 42,
@@ -113,8 +112,8 @@ export const feedItems: ContentItem[] = [
   },
   {
     id: "feed-blossom-reel",
-    title: "Orange Blossom Reel",
-    description: "A 60-second cinematic that premiered here first. Floral, warm, intimate.",
+    title: "New Content Drop Preview",
+    description: "First look at upcoming content dropping this week. Subscribers get early access.",
     mood: "Exclusive",
     access: "subscription",
     thumb: ["#a0522d", "#3d2a1e"],
@@ -125,8 +124,8 @@ export const feedItems: ContentItem[] = [
   },
   {
     id: "feed-personal-letter",
-    title: "A Note from the Hacienda",
-    description: "Personal update on what's coming next — and a small thank-you to everyone here.",
+    title: "Creator Update",
+    description: "Personal update on what's coming next, new features, and a thank-you to subscribers.",
     mood: "Personal",
     access: "subscription",
     thumb: ["#704214", "#241710"],
@@ -136,16 +135,15 @@ export const feedItems: ContentItem[] = [
   },
 ];
 
-/* ── La Bodega (Vault) items ──────────────────────────── */
+/* ── Media Vault items ──────────────────────────── */
 
 export const vaultItems: ContentItem[] = [
   {
     id: "vault-velvet-night",
-    title: "Velvet Night (Director Cut)",
-    description: "Extended cut with commentary and alternate score.",
-    mood: "PPV",
-    access: "ppv",
-    priceCents: 700,
+    title: "Extended Cut: Studio Session",
+    description: "Extended cut with commentary and behind-the-scenes footage.",
+    mood: "Exclusive",
+    access: "subscription",
     thumb: ["#5c2e1a", "#1a0f0a"],
     likes: 189,
     comments: 42,
@@ -153,22 +151,20 @@ export const vaultItems: ContentItem[] = [
   },
   {
     id: "vault-hacienda-prints",
-    title: "Hacienda Print Collection",
-    description: "High-res printable stills from the terracotta series.",
+    title: "Exclusive Photo Collection",
+    description: "High-res printable stills from recent content shoots.",
     mood: "Exclusive",
-    access: "one-time",
-    priceCents: 1900,
+    access: "subscription",
     thumb: ["#8b4513", "#3d1c02"],
     likes: 134,
     comments: 19,
   },
   {
     id: "vault-siesta-pack",
-    title: "La Siesta Film Pack",
-    description: "Mini-film, poster pack, and ambient audio stems.",
-    mood: "Drop",
-    access: "one-time",
-    priceCents: 2500,
+    title: "Content Bundle Pack",
+    description: "Mini-film, photo pack, and bonus content all in one.",
+    mood: "Exclusive",
+    access: "subscription",
     thumb: ["#704214", "#2e1e15"],
     likes: 267,
     comments: 33,
@@ -176,11 +172,10 @@ export const vaultItems: ContentItem[] = [
   },
   {
     id: "vault-moonlit-garden",
-    title: "Moonlit Garden Session",
-    description: "Exclusive PPV scene from the late-night garden series.",
-    mood: "PPV",
-    access: "ppv",
-    priceCents: 1200,
+    title: "Night Session Recording",
+    description: "Exclusive recording from the late-night studio session.",
+    mood: "Exclusive",
+    access: "subscription",
     thumb: ["#3d2a1e", "#1a0f0a"],
     likes: 198,
     comments: 24,
@@ -188,11 +183,10 @@ export const vaultItems: ContentItem[] = [
   },
   {
     id: "vault-terraza-replay",
-    title: "La Terraza Live Replay",
-    description: "Full replay of the 2-hour live session under the stars.",
+    title: "Live Session Replay",
+    description: "Full replay of the 2-hour live Q&A session.",
     mood: "Live",
-    access: "ppv",
-    priceCents: 900,
+    access: "subscription",
     thumb: ["#6b3410", "#1a0d01"],
     likes: 312,
     comments: 56,
@@ -200,57 +194,52 @@ export const vaultItems: ContentItem[] = [
   },
   {
     id: "vault-blossom-collection",
-    title: "Orange Blossom Collection",
-    description: "Curated photo set from the spring estate shoot.",
+    title: "Premium Photo Set",
+    description: "Curated photo set from recent content creation sessions.",
     mood: "Exclusive",
-    access: "one-time",
-    priceCents: 1500,
+    access: "subscription",
     thumb: ["#a0522d", "#5c3a2a"],
     likes: 245,
     comments: 29,
   },
 ];
 
-/* ── Scroll (DM) threads ─────────────────────────────── */
+/* ── Direct Message threads ─────────────────────────────── */
 
 export const scrollThreads: ScrollThread[] = [
   {
     id: "dm-welcome",
-    subject: "Bienvenido — welcome to the hacienda",
-    preview: "Thanks for stepping through the gate. Your first private gallery is unlocked.",
+    subject: "Welcome to the platform",
+    preview: "Thanks for subscribing. Your first exclusive content is unlocked.",
     timestamp: "Today, 3:42 PM",
   },
   {
     id: "dm-ppv-teaser",
-    subject: "Something waiting for you in La Bodega",
-    preview: "A sealed preview — just for you…",
+    subject: "New content waiting in your vault",
+    preview: "Exclusive preview — just for subscribers…",
     timestamp: "Yesterday, 11:18 PM",
-    ppv: true,
-    priceCents: 500,
   },
   {
     id: "dm-voice-note",
-    subject: "Voice note — evening on the terrace",
+    subject: "Voice note from the creator",
     preview: "▓▓▓░░░░░░░ 0:42",
     timestamp: "Mar 21, 8:30 PM",
     voice: true,
-    ppv: true,
-    priceCents: 300,
   },
   {
     id: "dm-update",
-    subject: "Live on La Terraza this Saturday",
-    preview: "Mark your calendar — the terrace opens at 9 PM.",
+    subject: "Live Q&A session this Saturday",
+    preview: "Mark your calendar — the live session starts at 9 PM.",
     timestamp: "Mar 20, 2:15 PM",
   },
 ];
 
-/* ── Tip tiers for The Offering ──────────────────────── */
+/* ── Tip tiers for Support ──────────────────────── */
 
 export const tipTiers = [
-  { id: "tip-small", label: "Flor", amountCents: 500, emoji: "🌸" },
-  { id: "tip-medium", label: "Vino", amountCents: 1500, emoji: "🍷" },
-  { id: "tip-large", label: "Fuego", amountCents: 5000, emoji: "🔥" },
+  { id: "tip-small", label: "Support", amountCents: 500, emoji: "💫" },
+  { id: "tip-medium", label: "Premium", amountCents: 1500, emoji: "⭐" },
+  { id: "tip-large", label: "VIP", amountCents: 5000, emoji: "�" },
 ];
 
 /* ── Helpers ──────────────────────────────────────────── */
@@ -268,7 +257,7 @@ export function canAccessContent(session: AppSession | null, item: ContentItem) 
 }
 
 export function tierBadge(plan: string) {
-  if (plan === "yearly") return "🗝️ La Alcoba";
-  if (plan === "quarterly") return "🪞 El Salón";
-  return "🌿 El Jardín";
+  if (plan === "yearly") return "⭐ VIP Access";
+  if (plan === "quarterly") return "🔥 Premium Access";
+  return "✨ Standard Access";
 }

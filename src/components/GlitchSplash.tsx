@@ -54,6 +54,7 @@ export function GlitchSplash() {
                 src="/logo-1.png" 
                 alt="xAnna Logo" 
                 fill 
+                sizes="20rem"
                 className="object-contain drop-shadow-[0_0_20px_rgba(255,51,102,0.8)]" 
                 priority
               />
@@ -74,7 +75,7 @@ export function GlitchSplash() {
                 repeatDelay: 1.2
               }}
             >
-               <Image src="/logo-2.png" alt="xAnna Logo Alt" fill className="object-contain" priority />
+               <Image src="/logo-2.png" alt="xAnna Logo Alt" fill sizes="20rem" className="object-contain" priority />
             </motion.div>
             
             <motion.div
@@ -90,7 +91,7 @@ export function GlitchSplash() {
                  repeatDelay: 0.8
                }}
             >
-               <Image src="/logo-1.png" alt="" fill className="object-contain filter hue-rotate-90 saturate-200" />
+               <Image src="/logo-1.png" alt="" fill sizes="20rem" className="object-contain filter hue-rotate-90 saturate-200" />
             </motion.div>
           </div>
         </motion.div>

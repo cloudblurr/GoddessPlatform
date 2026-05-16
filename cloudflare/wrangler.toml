@@ -1,0 +1,12 @@
+name = "goddess-scheduler"
+main = "scheduler-worker.mjs"
+compatibility_date = "2026-05-14"
+workers_dev = true
+
+[[kv_namespaces]]
+binding = "XANNA_SCHEDULES"
+id = "2a1c8cac10c84160ab09039112730045"
+preview_id = "2a1c8cac10c84160ab09039112730045"
+
+[vars]
+SCHEDULER_TOKEN = ""

@@ -11,9 +11,25 @@ import {
 } from "@/lib/auth";
 import { feedItems, vaultItems } from "@/lib/content";
 import { readStore, writeStore } from "@/lib/store";
-import type { MoodTag, AccessMode, MediaStatus, MediaType } from "@/lib/store";
+import type {
+  MoodTag,
+  AccessMode,
+  MediaStatus,
+  MediaType,
+  ComposerContentKind,
+  DeliveryTarget,
+} from "@/lib/store";
+import { enqueueCloudflareDelivery } from "@/lib/cloudflare-scheduler";
 
 const THIRTY_DAYS = 60 * 60 * 24 * 30;
+const CREATOR_STUDIO_KINDS: ComposerContentKind[] = [
+  "feed",
+  "store",
+  "unlockable",
+  "poll",
+  "announcement",
+  "livestream",
+];
 
 function defaultOwnedContent() {
   return feedItems
@@ -162,6 +178,146 @@ export async function sendTip(formData: FormData) {
   });
 
   redirect("/app/offering?sent=1");
+}
+
+function toStudioKind(raw: string): ComposerContentKind {
+  if (CREATOR_STUDIO_KINDS.includes(raw as ComposerContentKind)) {
+    return raw as ComposerContentKind;
+  }
+  return "feed";
+}
+
+function toDeliveryTarget(raw: string): DeliveryTarget {
+  return raw === "vault-only" ? "vault-only" : "fanfront";
+}
+
+function toMediaType(raw: string): MediaType {
+  if (raw === "video" || raw === "audio" || raw === "photo" || raw === "bundle" || raw === "text") {
+    return raw;
+  }
+  return "text";
+}
+
+function parsePollOptions(raw: string) {
+  return raw
+    .split(/\r?\n/g)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .slice(0, 6);
+}
+
+function thumbForKind(kind: ComposerContentKind): [string, string] {
+  if (kind === "store") return ["#5c2e1a", "#1a0f0a"];
+  if (kind === "unlockable") return ["#5a2147", "#14060f"];
+  if (kind === "poll") return ["#21485a", "#081018"];
+  if (kind === "announcement") return ["#6a4b1f", "#221307"];
+  if (kind === "livestream") return ["#254224", "#081208"];
+  return ["#8b5e3c", "#241710"];
+}
+
+export async function creatorStudioPublish(formData: FormData) {
+  const session = await getSessionFromCookies();
+  if (!session || session.role !== "creator") redirect("/entry");
+
+  const contentKind = toStudioKind(String(formData.get("contentKind") ?? "feed"));
+  const deliveryTarget = toDeliveryTarget(String(formData.get("deliveryTarget") ?? "fanfront"));
+  const title = String(formData.get("title") ?? "").trim();
+  const description = String(formData.get("description") ?? "").trim();
+  const mood = String(formData.get("mood") ?? "Personal") as MoodTag;
+  const accessInput = String(formData.get("access") ?? "subscription") as AccessMode;
+  const mediaType = toMediaType(String(formData.get("mediaType") ?? "text"));
+  const mediaUrl = String(formData.get("mediaUrl") ?? "").trim() || undefined;
+  const thumbnailUrl = String(formData.get("thumbnailUrl") ?? "").trim() || undefined;
+  const storageKey = String(formData.get("storageKey") ?? "").trim() || undefined;
+  const scheduledFor = String(formData.get("scheduledFor") ?? "").trim() || undefined;
+  const pollOptions = parsePollOptions(String(formData.get("pollOptions") ?? ""));
+  const priceDollars = Number(formData.get("price") ?? 0);
+  const priceCents = Number.isFinite(priceDollars) && priceDollars > 0 ? Math.round(priceDollars * 100) : undefined;
+
+  if (!title) redirect("/creator/feed?error=empty");
+  if (!description && contentKind !== "poll") redirect("/creator/feed?error=empty");
+  if (contentKind === "poll" && pollOptions.length < 2) redirect("/creator/feed?error=poll-options");
+
+  const store = await readStore();
+  const postId = `${contentKind}-${Date.now()}`;
+  const thumb = thumbForKind(contentKind);
+
+  if (contentKind === "store" || contentKind === "unlockable") {
+    const vaultAccess: AccessMode = contentKind === "store" ? "one-time" : "ppv";
+
+    store.vaultItems.unshift({
+      id: `vault-${postId}`,
+      title,
+      description,
+      mood,
+      access: vaultAccess,
+      priceCents,
+      thumb,
+      likes: 0,
+      comments: 0,
+      videoUrl: mediaUrl,
+      thumbnailUrl,
+      type: mediaType,
+      storageKey,
+      status: scheduledFor ? "scheduled" : "listed",
+      contentKind,
+      deliveryTarget,
+      scheduledFor,
+      views: 0,
+      purchases: 0,
+      uploadedAt: new Date().toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      }),
+    });
+  } else {
+    store.feedPosts.unshift({
+      id: `feed-${postId}`,
+      title,
+      description: description || "New interactive poll",
+      mood,
+      access: accessInput,
+      priceCents: accessInput === "subscription" ? undefined : priceCents,
+      thumb,
+      likes: 0,
+      comments: 0,
+      postedAt: "Just now",
+      pinned: false,
+      videoUrl: mediaUrl,
+      thumbnailUrl,
+      storageKey,
+      type: mediaType,
+      pollOptions: contentKind === "poll" ? pollOptions : undefined,
+      scheduledFor,
+      contentKind,
+      deliveryTarget,
+    });
+  }
+
+  await writeStore(store);
+
+  if (scheduledFor) {
+    const queueResult = await enqueueCloudflareDelivery({
+      id: postId,
+      contentKind,
+      title,
+      scheduledFor,
+      deployTarget: deliveryTarget,
+      mediaUrl,
+      storageKey,
+    });
+
+    if (!queueResult.queued) {
+      console.error("Cloudflare worker enqueue skipped", queueResult.reason);
+    }
+  }
+
+  revalidatePath("/app");
+  revalidatePath("/app/store");
+  revalidatePath("/creator/feed");
+  revalidatePath("/creator/vault");
+  redirect("/creator/feed?published=1");
 }
 
 /* ═══════════════════════════════════════════════════════════

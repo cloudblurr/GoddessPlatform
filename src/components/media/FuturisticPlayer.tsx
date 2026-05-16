@@ -104,7 +104,13 @@ export default function FuturisticPlayer({
 
       {type === "image" && (
         <div className="relative w-full aspect-[4/5] sm:aspect-video">
-          <Image src={src} alt={title || "Media"} fill className="object-cover" />
+          <Image
+            src={src}
+            alt={title || "Media"}
+            fill
+            sizes="(max-width: 768px) 100vw, 33vw"
+            className="object-cover"
+          />
         </div>
       )}
 

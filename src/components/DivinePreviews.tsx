@@ -101,7 +101,13 @@ export function DivinePreviews({ settings }: { settings: EntryPageSettings }) {
             {settings.previews.map((preview) => (
               <div key={preview.id} className="relative aspect-[3/4] rounded-2xl overflow-hidden border border-glass-border group shadow-2xl">
                 {preview.mediaType === "image" ? (
-                  <Image src={preview.mediaUrl} alt={preview.title} fill className="object-cover group-hover:scale-105 transition-transform duration-700 bg-bg-surface" />
+                  <Image
+                    src={preview.mediaUrl}
+                    alt={preview.title}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 25vw"
+                    className="object-cover group-hover:scale-105 transition-transform duration-700 bg-bg-surface"
+                  />
                 ) : (
                   <video src={preview.mediaUrl} autoPlay loop muted playsInline className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-700 bg-bg-surface" />
                 )}

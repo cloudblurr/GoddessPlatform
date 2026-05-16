@@ -12,6 +12,8 @@ export type MoodTag = "Exclusive" | "BTS" | "Personal" | "PPV" | "Drop" | "Live"
 export type AccessMode = "subscription" | "ppv" | "one-time";
 export type MediaStatus = "listed" | "unlisted" | "scheduled" | "stored";
 export type MediaType = "video" | "audio" | "photo" | "bundle" | "text";
+export type ComposerContentKind = "feed" | "store" | "unlockable" | "poll" | "announcement" | "livestream";
+export type DeliveryTarget = "fanfront" | "vault-only";
 
 export type DivinePreview = {
   id: string;
@@ -40,8 +42,13 @@ export type StoredPost = {
   postedAt: string;
   pinned?: boolean;
   videoUrl?: string;
+  thumbnailUrl?: string;
   storageKey?: string;
   type?: MediaType;
+  pollOptions?: string[];
+  scheduledFor?: string;
+  contentKind?: ComposerContentKind;
+  deliveryTarget?: DeliveryTarget;
 };
 
 export type StoredVaultItem = {
@@ -55,16 +62,21 @@ export type StoredVaultItem = {
   likes: number;
   comments: number;
   videoUrl?: string;
+  thumbnailUrl?: string;
   type?: MediaType;
-  // Bunny Storage Zone
-  storageKey?: string;         // Path in Bunny Storage Zone, e.g. "vault/item-id/video.mp4"
+  // R2 Storage
+  storageKey?: string;         // R2 object key, e.g. "creators/creator/uploads/video.mp4"
   // Creator-side metadata
   status: MediaStatus;
+  contentKind?: ComposerContentKind;
+  deliveryTarget?: DeliveryTarget;
   fileSize?: string;
   uploadedAt?: string;
   scheduledFor?: string;
   views: number;
   purchases: number;
+  // Download URL (populated at runtime for unlocked content)
+  downloadUrl?: string;
 };
 
 export type AppStore = {
@@ -97,6 +109,8 @@ function defaultStore(): AppStore {
       pinned: i.pinned,
       videoUrl: i.videoUrl,
       type: i.type as MediaType | undefined,
+      contentKind: "feed" as ComposerContentKind,
+      deliveryTarget: "fanfront" as DeliveryTarget,
     })),
     vaultItems: vaultItems.map((i) => ({
       id: i.id,
@@ -111,6 +125,8 @@ function defaultStore(): AppStore {
       videoUrl: i.videoUrl,
       type: i.type as MediaType | undefined,
       status: "listed" as MediaStatus,
+      contentKind: "store" as ComposerContentKind,
+      deliveryTarget: "fanfront" as DeliveryTarget,
       views: 0,
       purchases: 0,
     })),

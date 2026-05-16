@@ -15,14 +15,14 @@ export default async function EntryPage({ searchParams }: EntryPageProps) {
   const { error } = await searchParams;
   const store = await readStore();
   const settings = store.entrySettings || {
-    heroTitle: "Goddess Annalesse",
-    heroSubtitle: "A delicate touch of luxury from the Queen of your feed.",
-    revealHeadline: "Want to go to Heaven? This is inside.",
+    heroTitle: "Xanna",
+    heroSubtitle: "Exclusive content. Direct connection. The creator experience you've been waiting for.",
+    revealHeadline: "Unlock the full experience.",
     previews: [
-      { id: "p1", title: "Platinum Dripped Aura", mediaUrl: "/logo-2.png", mediaType: "image" as const },
-      { id: "p2", title: "Eternal Grace", mediaUrl: "/logo-1.png", mediaType: "image" as const },
-      { id: "p3", title: "Midnight Routine", mediaUrl: "https://files.catbox.moe/97ukl2.mp4", mediaType: "video" as const },
-      { id: "p4", title: "Sanctum Secrets", mediaUrl: "https://files.catbox.moe/3lohl1.mp4", mediaType: "video" as const }
+      { id: "p1", title: "Behind the Scenes", mediaUrl: "/anna2.jpg", mediaType: "image" as const },
+      { id: "p2", title: "Exclusive Content", mediaUrl: "/anna3.jpg", mediaType: "image" as const },
+      { id: "p3", title: "Creator Life", mediaUrl: "/anna4.jpg", mediaType: "image" as const },
+      { id: "p4", title: "Premium Access", mediaUrl: "/xanamain.jpg", mediaType: "image" as const }
     ]
   };
 
@@ -52,7 +52,7 @@ export default async function EntryPage({ searchParams }: EntryPageProps) {
           <div className="gw-creator-photo">
             <div className="gw-creator-photo-glint"></div>
             <Image
-              src="/XannaMain.png"
+              src="/xanamain.jpg"
               alt={settings.heroTitle}
               width={480}
               height={640}
@@ -66,16 +66,16 @@ export default async function EntryPage({ searchParams }: EntryPageProps) {
 
           <div className="gw-hero-stats">
             <span className="gw-stat-pill"><Users size={14} /> {creatorProfile.memberCount} members</span>
-            <span className="gw-stat-pill"><Star size={14} /> Exclusive</span>
+            <span className="gw-stat-pill"><Star size={14} /> Exclusive Content</span>
           </div>
         </div>
       </section>
 
-      {/* ── Central Focus: The Five Pillars (Animated Slideshow) ─ */}
+      {/* ── Content Showcase (Animated Slideshow) ─ */}
       <section className="gw-pillars-section">
         <div className="gw-pillars-header">
-          <h2 className="section-title">The Five Pillars</h2>
-          <p className="gw-pillars-sub">The foundation of everything built within the hacienda.</p>
+          <h2 className="section-title">Exclusive Content</h2>
+          <p className="gw-pillars-sub">Behind-the-scenes access, premium posts, and creator experiences.</p>
         </div>
         
         <div className="gw-slideshow-container">
@@ -85,19 +85,43 @@ export default async function EntryPage({ searchParams }: EntryPageProps) {
               {[...Array(2)].map((_, i) => (
                 <div key={i} className="gw-slideshow-y-group">
                   <div className="gw-slide-y-item p-8">
-                    <Image src="/logo-2.png" alt="Mood" fill className="gw-slide-img object-contain drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]" />
+                    <Image
+                      src="/anna2.jpg"
+                      alt="Behind the Scenes"
+                      fill
+                      sizes="(max-width: 768px) 100vw, 260px"
+                      className="gw-slide-img object-cover"
+                    />
                     <div className="gw-slide-glaze"></div>
                   </div>
                   <div className="gw-slide-y-item p-8">
-                    <Image src="/logo-1.png" alt="Vibe" fill className="gw-slide-img object-contain drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]" />
+                    <Image
+                      src="/anna3.jpg"
+                      alt="Exclusive Content"
+                      fill
+                      sizes="(max-width: 768px) 100vw, 260px"
+                      className="gw-slide-img object-cover"
+                    />
                     <div className="gw-slide-glaze"></div>
                   </div>
                   <div className="gw-slide-y-item p-8">
-                    <Image src="/logo-2.png" alt="Style" fill className="gw-slide-img object-contain drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]" />
+                    <Image
+                      src="/anna4.jpg"
+                      alt="Creator Life"
+                      fill
+                      sizes="(max-width: 768px) 100vw, 260px"
+                      className="gw-slide-img object-cover"
+                    />
                     <div className="gw-slide-glaze"></div>
                   </div>
                   <div className="gw-slide-y-item p-8">
-                    <Image src="/logo-1.png" alt="Aura" fill className="gw-slide-img object-contain drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]" />
+                    <Image
+                      src="/xanamain.jpg"
+                      alt="Premium Access"
+                      fill
+                      sizes="(max-width: 768px) 100vw, 260px"
+                      className="gw-slide-img object-cover"
+                    />
                     <div className="gw-slide-glaze"></div>
                   </div>
                 </div>
@@ -130,13 +154,13 @@ export default async function EntryPage({ searchParams }: EntryPageProps) {
 
       {/* ── Social proof ─────────────────────────────────── */}
       <div className="gw-proof">
-        <span className="gw-proof-pill"><Sparkles size={14} /> {creatorProfile.memberCount} members inside</span>
+        <span className="gw-proof-pill"><Sparkles size={14} /> {creatorProfile.memberCount} subscribers</span>
         <div className="gw-ticker">
-          <span><Zap size={12} /> &quot;This is unlike anything else&quot;</span>
-          <span><Star size={12} /> &quot;Best subscription I own&quot;</span>
-          <span><Eye size={12} /> &quot;Completely addictive content&quot;</span>
+          <span><Zap size={12} /> &quot;The best creator platform experience&quot;</span>
+          <span><Star size={12} /> &quot;Exclusive content I can't find anywhere else&quot;</span>
+          <span><Eye size={12} /> &quot;Direct connection with the creator&quot;</span>
           <span><CheckCircle size={12} /> &quot;Worth every single cent&quot;</span>
-          <span><MessageCircle size={12} /> &quot;Feels like a private world&quot;</span>
+          <span><MessageCircle size={12} /> &quot;Like having a private membership&quot;</span>
         </div>
       </div>
 
@@ -145,7 +169,7 @@ export default async function EntryPage({ searchParams }: EntryPageProps) {
 
       {/* ── Pricing with floating animation ──────────────── */}
       <section className="gw-pricing" id="pricing">
-        <h2>Join Now</h2>
+        <h2>Choose Your Access Level</h2>
         <div className="gw-pricing-grid">
           {pricingPlans.map((plan) => (
             <article
@@ -167,7 +191,7 @@ export default async function EntryPage({ searchParams }: EntryPageProps) {
               <form action={subscribeAndEnter}>
                 <input type="hidden" name="plan" value={plan.id} />
                 <button type="submit" className="gw-enter-btn">
-                  <Lock size={16} /> Subscribe Now
+                  <Lock size={16} /> Get Access
                 </button>
               </form>
             </article>

@@ -6,3 +6,6 @@ coverage/
 *.log
 .env*
 !.env.example
+
+# Droplet provisioning output
+cloudreve-droplet-info.json

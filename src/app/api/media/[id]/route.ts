@@ -1,27 +1,37 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifySecureToken } from "@/lib/cloudreve";
+import { createPresignedDownload, r2IsConfigured } from "@/lib/r2";
+import { getSessionFromCookies } from "@/lib/auth";
 
-export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+/**
+ * GET /api/media/[id]
+ * Returns a presigned R2 download URL for a given object key.
+ * The [id] param is the base64url-encoded R2 key.
+ */
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const session = await getSessionFromCookies();
+  if (!session) {
+    return new NextResponse("Unauthorized", { status: 401 });
+  }
+
   const { id } = await params;
-  const token = req.nextUrl.searchParams.get("token");
-  const userId = req.headers.get("x-user-id") || "anonymous";
+  const key = decodeURIComponent(id);
 
-  if (!token) {
-    return new NextResponse("Access Denied: Missing xAnna0-god token", { status: 401 });
+  if (!r2IsConfigured()) {
+    return NextResponse.json({ error: "Storage not configured" }, { status: 503 });
   }
 
-  const isValid = verifySecureToken(token, id, userId);
-  
-  if (!isValid) {
-    return new NextResponse("Access Denied: Invalid or expired token", { status: 403 });
+  try {
+    const url = await createPresignedDownload(key, 3600);
+    const mode = req.nextUrl.searchParams.get("mode");
+    if (mode === "redirect") {
+      return NextResponse.redirect(url);
+    }
+    return NextResponse.json({ url, key });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Failed";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
-
-  // If valid, we simulate a Cloudreve fetch and stream back the file
-  // In production, we might fetch the stream from sirhx.space with our admin cookie and return it
-  // For demonstration, we just return a success payload or redirect
-
-  // const cloudreveStream = await fetch(`https://sirhx.space/api/v3/file/download/${id}`, { headers: ... });
-  // return new NextResponse(cloudreveStream.body, { ... })
-
-  return NextResponse.redirect(new URL("/mock-media", req.url));
 }
