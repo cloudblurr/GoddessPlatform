@@ -1,8 +1,8 @@
 #!/usr/bin/env tsx
 import * as https from "https";
 
-const DO  = "dop_v1_1cfa54209055768a3a82ae48b917c3a21ae3bb13b4eb8ffd12e0109d54ef7b25";
-const CF  = "cfat_Fkc32uqVBfPXgm4p7H6ThfFoFjhb3BvmCqCaMb2y8700e4b9";
+const DO  = process.env.DIGITALOCEAN_API_KEY!;
+const CF  = process.env.CLOUDFLARE_API_TOKEN!;
 const CF_ACCOUNT = "c08ec4594091cc1873b26470316f876c";
 
 function get(host: string, path: string, token: string): Promise<any> {

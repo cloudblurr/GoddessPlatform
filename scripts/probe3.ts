@@ -3,7 +3,7 @@ import * as https from "https";
 import * as dns from "dns";
 import { promisify } from "util";
 
-const CF  = "cfat_Fkc32uqVBfPXgm4p7H6ThfFoFjhb3BvmCqCaMb2y8700e4b9";
+const CF  = process.env.CLOUDFLARE_API_TOKEN!;
 const CF_ACCOUNT = "c08ec4594091cc1873b26470316f876c";
 
 const resolve4 = promisify(dns.resolve4);
