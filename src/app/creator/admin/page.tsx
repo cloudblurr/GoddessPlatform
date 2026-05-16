@@ -11,71 +11,54 @@ export default async function AdminSecurityPage() {
   ];
 
   return (
-    <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-6 duration-700">
-      <header className="flex items-end justify-between border-b border-red-500/20 pb-6">
+    <div className="space-y-6 animate-fade-in">
+      <header className="flex items-end justify-between border-b border-[var(--glass-border)] pb-5">
         <div>
-          <h2 className="text-sm font-mono tracking-[0.2em] text-red-500 uppercase mb-2">Security Override</h2>
-          <h1 className="text-4xl font-heading font-medium tracking-tight text-white">Access & Ban Control</h1>
+          <p className="eyebrow mb-1">Security</p>
+          <h1 className="text-3xl font-bold tracking-tight">Access Control</h1>
         </div>
-        <div className="px-4 py-2 rounded-full border border-red-500/30 bg-red-500/10 text-red-400 font-mono text-xs flex items-center gap-2">
-          <AlertTriangle size={14} />
-          xAnna0-god Layer Active
-        </div>
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-red-500/30 bg-red-500/10 px-3 py-1 text-[10px] font-semibold text-red-400">
+          <AlertTriangle size={11} /> Admin Active
+        </span>
       </header>
 
-      <div className="w-full flex items-center gap-4 bg-[#ffffff05] border border-white/10 rounded-xl p-2 px-4 focus-within:border-red-500/50 transition-colors">
-        <Search size={20} className="text-white/40" />
-        <input 
-          type="text" 
-          placeholder="Search handles, IDs to enforce action..." 
-          className="bg-transparent border-none outline-none flex-1 py-2 text-white placeholder-white/30"
-        />
+      <div className="flex items-center gap-3 rounded-lg border border-[var(--glass-border)] bg-[var(--bg-raised)] px-3 py-2 focus-within:border-[var(--accent)]/40 transition-colors">
+        <Search size={15} className="text-[var(--ink-faint)]" />
+        <input type="text" placeholder="Search users…" className="bg-transparent border-none outline-none flex-1 text-sm placeholder:text-[var(--ink-faint)]" />
       </div>
 
-      <div className="border border-white/5 rounded-2xl overflow-hidden bg-[#050505]">
-        <table className="w-full text-left font-sans">
-          <thead className="bg-[#ffffff02] border-b border-white/5">
+      <div className="glass-card overflow-hidden">
+        <table className="w-full text-left text-sm">
+          <thead className="border-b border-[var(--glass-border)]">
             <tr>
-              <th className="py-4 px-6 text-white/50 font-medium text-sm">User Identity</th>
-              <th className="py-4 px-6 text-white/50 font-medium text-sm">Status</th>
-              <th className="py-4 px-6 text-white/50 font-medium text-sm">Flags</th>
-              <th className="py-4 px-6 text-white/50 font-medium text-sm text-right">Actions</th>
+              <th className="py-3 px-4 text-[var(--ink-muted)] font-medium text-xs">User</th>
+              <th className="py-3 px-4 text-[var(--ink-muted)] font-medium text-xs">Status</th>
+              <th className="py-3 px-4 text-[var(--ink-muted)] font-medium text-xs">Flags</th>
+              <th className="py-3 px-4 text-[var(--ink-muted)] font-medium text-xs text-right">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-white/5">
-            {mockUsers.map(u => (
-              <tr key={u.id} className="hover:bg-white/[0.02] transition-colors group">
-                <td className="py-4 px-6">
-                  <div className="flex flex-col">
-                    <span className="font-semibold text-white/90">{u.handle}</span>
-                    <span className="font-mono text-xs text-white/30">{u.id}</span>
-                  </div>
+          <tbody className="divide-y divide-[var(--glass-border)]">
+            {mockUsers.map((u) => (
+              <tr key={u.id} className="hover:bg-white/[0.02] transition-colors">
+                <td className="py-3 px-4">
+                  <p className="font-medium text-sm">{u.handle}</p>
+                  <p className="text-[10px] text-[var(--ink-faint)] font-mono">{u.id}</p>
                 </td>
-                <td className="py-4 px-6">
+                <td className="py-3 px-4">
                   {u.status === "ACTIVE" ? (
-                    <span className="inline-flex items-center gap-2 text-green-400 bg-green-400/10 px-3 py-1 rounded-full text-xs font-mono font-bold">
-                      <CheckCircle2 size={12} /> OK
-                    </span>
+                    <span className="inline-flex items-center gap-1.5 text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded-full text-[10px] font-semibold"><CheckCircle2 size={10} /> OK</span>
                   ) : (
-                    <span className="inline-flex items-center gap-2 text-red-500 bg-red-500/10 px-3 py-1 rounded-full text-xs font-mono font-bold">
-                      <Ban size={12} /> ENFORCED
-                    </span>
+                    <span className="inline-flex items-center gap-1.5 text-red-400 bg-red-500/10 px-2 py-0.5 rounded-full text-[10px] font-semibold"><Ban size={10} /> Banned</span>
                   )}
                 </td>
-                <td className="py-4 px-6">
-                  <span className={`text-sm ${u.violations > 0 ? "text-yellow-500" : "text-white/30"}`}>
-                    {u.violations} Incidents
-                  </span>
+                <td className="py-3 px-4">
+                  <span className={`text-xs ${u.violations > 0 ? "text-amber-400" : "text-[var(--ink-faint)]"}`}>{u.violations} incidents</span>
                 </td>
-                <td className="py-4 px-6 text-right">
+                <td className="py-3 px-4 text-right">
                   {u.status === "ACTIVE" ? (
-                    <button className="px-4 py-2 rounded border border-red-500/30 text-red-400 hover:bg-red-500 hover:text-white transition-all text-xs font-bold tracking-wider uppercase">
-                      Ban User
-                    </button>
+                    <button className="px-3 py-1.5 rounded-md border border-red-500/30 text-red-400 hover:bg-red-500/10 text-[10px] font-semibold uppercase tracking-wider transition-colors">Ban</button>
                   ) : (
-                    <button className="px-4 py-2 rounded border border-white/10 text-white/50 hover:text-white transition-all text-xs font-bold tracking-wider uppercase">
-                      Revoke Ban
-                    </button>
+                    <button className="px-3 py-1.5 rounded-md border border-[var(--glass-border)] text-[var(--ink-muted)] hover:text-[var(--ink)] text-[10px] font-semibold uppercase tracking-wider transition-colors">Revoke</button>
                   )}
                 </td>
               </tr>
@@ -83,7 +66,6 @@ export default async function AdminSecurityPage() {
           </tbody>
         </table>
       </div>
-
     </div>
   );
 }

@@ -127,88 +127,89 @@ export default function StudioComposer({
     setSelectedMediaUrl(mediaUrlForKey(item.key));
   };
 
+  const inputCls = "mt-1 w-full rounded-lg border border-[var(--glass-border)] bg-[var(--bg-raised)] px-3 py-2 text-sm text-[var(--ink)] placeholder:text-[var(--ink-faint)] focus:outline-none focus:border-[var(--accent)]/40 transition-colors";
+  const labelCls = "text-[11px] font-semibold uppercase tracking-wider text-[var(--ink-muted)]";
+
   return (
-    <div className="flex flex-col gap-8 animate-in fade-in slide-in-from-bottom-6 duration-700">
-      <header className="flex items-end justify-between border-b border-white/10 pb-6">
+    <div className="space-y-6 animate-fade-in">
+      <header className="flex items-end justify-between border-b border-[var(--glass-border)] pb-5">
         <div>
-          <h2 className="text-sm font-mono tracking-[0.2em] text-[#C9A84C] uppercase mb-2">Creator Studio</h2>
-          <h1 className="text-4xl font-heading font-medium tracking-tight">Compose & Deliver</h1>
+          <p className="eyebrow mb-1">Creator Studio</p>
+          <h1 className="text-3xl font-bold tracking-tight">Post Engine</h1>
         </div>
       </header>
 
       {published && (
-        <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200 flex items-center gap-2">
-          <CheckCircle2 size={16} /> Published successfully.
+        <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-300 flex items-center gap-2">
+          <CheckCircle2 size={15} /> Published successfully.
         </div>
       )}
 
       {error && (
-        <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+        <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
           {error === "poll-options" ? "Poll posts require at least two options." : "Title and description are required."}
         </div>
       )}
 
-      <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 space-y-4">
+      {/* R2 Media Picker */}
+      <section className="glass-card p-5 space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-[#C9A84C]">R2 Media Library</p>
-            <p className="text-sm text-white/60 mt-1">Choose an uploaded file from Storage, then attach it into the composer.</p>
+            <p className="eyebrow">R2 Media Library</p>
+            <p className="text-xs text-[var(--ink-muted)] mt-1">Select media from Cloud Storage to attach.</p>
           </div>
-
           <button
             type="button"
             onClick={() => loadR2Files(r2Prefix || DEFAULT_R2_PREFIX)}
-            className="inline-flex items-center gap-2 rounded-full border border-white/20 px-3 py-1.5 text-xs text-white/80 hover:bg-white/10"
+            className="inline-flex items-center gap-1.5 rounded-full border border-[var(--glass-border)] px-3 py-1.5 text-xs text-[var(--ink-muted)] hover:text-[var(--ink)] hover:border-[var(--accent)]/30 transition-colors"
           >
-            <RefreshCcw size={14} className={r2Loading ? "animate-spin" : ""} /> Refresh
+            <RefreshCcw size={12} className={r2Loading ? "animate-spin" : ""} /> Refresh
           </button>
         </div>
 
-        <p className="text-xs text-white/50">Prefix: {r2Prefix || "creator root"}</p>
-        {r2Error && <p className="text-sm text-red-300">{r2Error}</p>}
+        <p className="text-[10px] text-[var(--ink-faint)]">Prefix: {r2Prefix || "root"}</p>
+        {r2Error && <p className="text-xs text-red-400">{r2Error}</p>}
 
         {!r2Configured ? (
-          <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-amber-100">
-            R2 is not configured yet. Add credentials on the Storage page before attaching files.
+          <div className="rounded-lg border border-amber-500/20 bg-amber-500/10 p-3 text-xs text-amber-300">
+            R2 not configured. Add credentials on the Storage page first.
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 max-h-[320px] overflow-auto pr-1">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 max-h-64 overflow-auto">
             {r2Loading ? (
-              <div className="text-sm text-white/60">Loading files...</div>
+              <p className="text-xs text-[var(--ink-muted)]">Loading…</p>
             ) : r2Items.length === 0 ? (
-              <div className="text-sm text-white/60">No files in this folder yet. Upload in Storage, then refresh.</div>
+              <p className="text-xs text-[var(--ink-muted)]">No files yet. Upload in Storage.</p>
             ) : (
               r2Items.map((item) => (
                 <button
                   type="button"
                   key={item.key}
-                  onClick={() => {
-                    chooseAsset(item);
-                  }}
-                  className={`text-left rounded-xl border px-3 py-2 transition ${
+                  onClick={() => chooseAsset(item)}
+                  className={`text-left rounded-lg border px-3 py-2 transition-colors ${
                     selectedAsset?.key === item.key
-                      ? "border-[#C9A84C]/60 bg-[#C9A84C]/10"
-                      : "border-white/10 bg-black/20 hover:border-white/25"
+                      ? "border-[var(--accent)]/50 bg-[var(--accent-dim)]"
+                      : "border-[var(--glass-border)] bg-[var(--bg-raised)] hover:border-[var(--accent)]/20"
                   }`}
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg border border-white/10 bg-white/5 flex items-center justify-center overflow-hidden">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-md border border-[var(--glass-border)] bg-[var(--bg-overlay)] flex items-center justify-center overflow-hidden shrink-0">
                       {!item.isFolder && mediaTypeFromMime(item.name, item.contentType) === "photo" ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={mediaUrlForKey(item.key)} alt={item.name} className="w-full h-full object-cover" />
                       ) : item.isFolder ? (
-                        <Folder size={18} className="text-[#C9A84C]" />
+                        <Folder size={14} className="text-[var(--accent)]" />
                       ) : mediaTypeFromMime(item.name, item.contentType) === "video" ? (
-                        <Video size={18} className="text-white/70" />
+                        <Video size={14} className="text-[var(--ink-muted)]" />
                       ) : mediaTypeFromMime(item.name, item.contentType) === "audio" ? (
-                        <Music size={18} className="text-white/70" />
+                        <Music size={14} className="text-[var(--ink-muted)]" />
                       ) : (
-                        <ImageIcon size={18} className="text-white/70" />
+                        <ImageIcon size={14} className="text-[var(--ink-muted)]" />
                       )}
                     </div>
                     <div className="min-w-0">
-                      <p className="text-sm font-medium truncate">{item.name}</p>
-                      <p className="text-xs text-white/50 truncate">{item.isFolder ? item.key : formatBytes(item.size)}</p>
+                      <p className="text-xs font-medium truncate">{item.name}</p>
+                      <p className="text-[10px] text-[var(--ink-faint)] truncate">{item.isFolder ? item.key : formatBytes(item.size)}</p>
                     </div>
                   </div>
                 </button>
@@ -218,18 +219,19 @@ export default function StudioComposer({
         )}
       </section>
 
-      <section className="rounded-2xl border border-white/10 bg-black/20 p-6 space-y-6">
-        <div className="flex items-center justify-between gap-4">
-          <h3 className="text-lg font-medium">Content Composer</h3>
+      {/* Composer */}
+      <section className="glass-card p-5 space-y-5">
+        <div className="flex items-center justify-between gap-3">
+          <h3 className="text-sm font-semibold">Content Composer</h3>
           {selectedAsset && (
-            <span className="inline-flex items-center gap-2 rounded-full border border-[#C9A84C]/40 bg-[#C9A84C]/10 px-3 py-1 text-xs text-[#C9A84C]">
-              <Cloud size={14} /> Linked: {selectedAsset.name}
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--accent)]/30 bg-[var(--accent-dim)] px-2.5 py-1 text-[10px] font-medium text-[var(--accent-bright)]">
+              <Cloud size={12} /> {selectedAsset.name}
             </span>
           )}
         </div>
 
         {selectedAsset && selectedMediaUrl && (
-          <div className="grid lg:grid-cols-[280px_1fr] gap-4 rounded-xl border border-white/10 bg-white/[0.02] p-4">
+          <div className="grid lg:grid-cols-[240px_1fr] gap-4 rounded-lg border border-[var(--glass-border)] bg-[var(--bg-raised)] p-3">
             <div>
               <FuturisticPlayer
                 type={toPlayerType(selectedMediaType)}
@@ -238,16 +240,14 @@ export default function StudioComposer({
                 title={selectedAsset.name}
               />
             </div>
-            <div className="text-sm text-white/70 space-y-2">
-              <p><span className="text-white/40">Asset:</span> {selectedAsset.name}</p>
-              <p><span className="text-white/40">Storage key:</span> {selectedAsset.key}</p>
-              <p><span className="text-white/40">Type:</span> {selectedMediaType}</p>
-              <p className="text-xs text-white/45">This authenticated media URL is attached to your post and can be delivered to FanFront or vault-only destinations.</p>
+            <div className="text-xs text-[var(--ink-muted)] space-y-1.5">
+              <p><span className="text-[var(--ink-faint)]">Asset:</span> {selectedAsset.name}</p>
+              <p><span className="text-[var(--ink-faint)]">Key:</span> {selectedAsset.key}</p>
+              <p><span className="text-[var(--ink-faint)]">Type:</span> {selectedMediaType}</p>
             </div>
           </div>
         )}
 
-        {/* Live Preview */}
         {(formTitle || formDescription || selectedMediaUrl) && (
           <ContentPreview
             title={formTitle}
@@ -271,7 +271,7 @@ export default function StudioComposer({
 
           <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <label className="text-xs uppercase tracking-[0.2em] text-white/50">Content Type</label>
+              <label className={labelCls}>Content Type</label>
               <select
                 name="contentKind"
                 value={contentKind}
@@ -286,47 +286,31 @@ export default function StudioComposer({
                     setFormPrice(defaultPriceFor(nextKind, nextAccess));
                   }
                 }}
-                className="mt-1 w-full rounded-lg border border-white/15 bg-black/30 px-3 py-2 text-sm"
+                className={inputCls}
               >
                 {kindOptions.map((item) => (
                   <option key={item.value} value={item.value}>{item.label}</option>
                 ))}
               </select>
-              <p className="mt-1 text-xs text-white/45">{kindOptions.find((k) => k.value === contentKind)?.subtitle}</p>
+              <p className="mt-1 text-[10px] text-[var(--ink-faint)]">{kindOptions.find((k) => k.value === contentKind)?.subtitle}</p>
             </div>
-
             <div>
-              <label className="text-xs uppercase tracking-[0.2em] text-white/50">Delivery Target</label>
-              <select
-                name="deliveryTarget"
-                className="mt-1 w-full rounded-lg border border-white/15 bg-black/30 px-3 py-2 text-sm"
-                defaultValue="fanfront"
-              >
-                <option value="fanfront">FanFront (subscriber-facing)</option>
-                <option value="vault-only">Vault Only (stored/scheduled)</option>
+              <label className={labelCls}>Delivery Target</label>
+              <select name="deliveryTarget" className={inputCls} defaultValue="fanfront">
+                <option value="fanfront">FanFront (subscriber)</option>
+                <option value="vault-only">Vault Only (stored)</option>
               </select>
             </div>
           </div>
 
           <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <label className="text-xs uppercase tracking-[0.2em] text-white/50">Title</label>
-              <input 
-                name="title" 
-                required 
-                value={formTitle}
-                onChange={(e) => setFormTitle(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-white/15 bg-black/30 px-3 py-2 text-sm" 
-              />
+              <label className={labelCls}>Title</label>
+              <input name="title" required value={formTitle} onChange={(e) => setFormTitle(e.target.value)} className={inputCls} />
             </div>
             <div>
-              <label className="text-xs uppercase tracking-[0.2em] text-white/50">Mood</label>
-              <select 
-                name="mood" 
-                value={formMood}
-                onChange={(e) => setFormMood(e.target.value as MoodTag)}
-                className="mt-1 w-full rounded-lg border border-white/15 bg-black/30 px-3 py-2 text-sm"
-              >
+              <label className={labelCls}>Mood</label>
+              <select name="mood" value={formMood} onChange={(e) => setFormMood(e.target.value as MoodTag)} className={inputCls}>
                 <option value="Exclusive">Exclusive</option>
                 <option value="BTS">BTS</option>
                 <option value="Personal">Personal</option>
@@ -338,20 +322,13 @@ export default function StudioComposer({
           </div>
 
           <div>
-            <label className="text-xs uppercase tracking-[0.2em] text-white/50">Description</label>
-            <textarea
-              name="description"
-              rows={3}
-              required={contentKind !== "poll"}
-              value={formDescription}
-              onChange={(e) => setFormDescription(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-white/15 bg-black/30 px-3 py-2 text-sm"
-            />
+            <label className={labelCls}>Description</label>
+            <textarea name="description" rows={3} required={contentKind !== "poll"} value={formDescription} onChange={(e) => setFormDescription(e.target.value)} className={inputCls} />
           </div>
 
           <div className="grid md:grid-cols-3 gap-4">
             <div>
-              <label className="text-xs uppercase tracking-[0.2em] text-white/50">Access</label>
+              <label className={labelCls}>Access</label>
               <select
                 name="access"
                 value={effectiveAccess}
@@ -361,92 +338,71 @@ export default function StudioComposer({
                   setFormPrice(defaultPriceFor(contentKind, nextAccess));
                 }}
                 disabled={isVaultType}
-                className="mt-1 w-full rounded-lg border border-white/15 bg-black/30 px-3 py-2 text-sm disabled:opacity-60"
+                className={`${inputCls} disabled:opacity-50`}
               >
                 <option value="subscription">Subscription</option>
                 <option value="ppv">PPV</option>
                 <option value="one-time">One-time</option>
               </select>
             </div>
-
             <div>
-              <label className="text-xs uppercase tracking-[0.2em] text-white/50">Price (USD)</label>
-              <input
-                name="price"
-                type="number"
-                min={0}
-                step="0.01"
-                value={formPrice}
-                onChange={(e) => setFormPrice(Number(e.target.value))}
-                className="mt-1 w-full rounded-lg border border-white/15 bg-black/30 px-3 py-2 text-sm"
-              />
+              <label className={labelCls}>Price (USD)</label>
+              <input name="price" type="number" min={0} step="0.01" value={formPrice} onChange={(e) => setFormPrice(Number(e.target.value))} className={inputCls} />
             </div>
-
             <div>
-              <label className="text-xs uppercase tracking-[0.2em] text-white/50">Schedule (optional)</label>
-              <input
-                type="datetime-local"
-                name="scheduledFor"
-                className="mt-1 w-full rounded-lg border border-white/15 bg-black/30 px-3 py-2 text-sm"
-              />
+              <label className={labelCls}>Schedule (optional)</label>
+              <input type="datetime-local" name="scheduledFor" className={inputCls} />
             </div>
           </div>
 
           {contentKind === "poll" && (
             <div>
-              <label className="text-xs uppercase tracking-[0.2em] text-white/50">Poll Options (one per line)</label>
-              <textarea
-                name="pollOptions"
-                rows={4}
-                placeholder={"Option A\nOption B\nOption C"}
-                value={formPollOptions}
-                onChange={(e) => setFormPollOptions(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-white/15 bg-black/30 px-3 py-2 text-sm"
-              />
+              <label className={labelCls}>Poll Options (one per line)</label>
+              <textarea name="pollOptions" rows={4} placeholder={"Option A\nOption B\nOption C"} value={formPollOptions} onChange={(e) => setFormPollOptions(e.target.value)} className={inputCls} />
             </div>
           )}
 
           <div className="pt-2">
             <button
               type="submit"
-              className="rounded-full border border-[#C9A84C]/50 bg-[#C9A84C]/20 px-5 py-2.5 text-sm font-medium text-[#E7D19B] hover:bg-[#C9A84C]/30"
+              className="inline-flex items-center gap-2 rounded-full bg-[var(--accent)] text-[var(--bg-base)] px-5 py-2.5 text-sm font-semibold hover:brightness-110 transition-all shadow-[0_2px_16px_rgba(167,139,250,0.2)]"
             >
               Publish from Studio
             </button>
-            <p className="mt-2 text-xs text-white/45">Scheduled items attempt enqueue to your Cloudflare Worker when `CLOUDFLARE_WORKER_SCHEDULER_URL` is configured.</p>
+            <p className="mt-2 text-[10px] text-[var(--ink-faint)]">Scheduled items enqueue to your Cloudflare Worker when configured.</p>
           </div>
         </form>
       </section>
 
+      {/* Recent items */}
       <section className="grid lg:grid-cols-2 gap-4">
-        <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
-          <h4 className="text-sm uppercase tracking-[0.2em] text-[#C9A84C] mb-3">Recent Feed Posts</h4>
-          <div className="space-y-3">
+        <div className="glass-card p-4">
+          <h4 className="eyebrow mb-3">Recent Feed Posts</h4>
+          <div className="space-y-2">
             {initialFeedPosts.length === 0 ? (
-              <p className="text-sm text-white/60">No feed posts yet.</p>
+              <p className="text-xs text-[var(--ink-muted)]">No feed posts yet.</p>
             ) : (
               initialFeedPosts.map((post) => (
-                <article key={post.id} className="rounded-xl border border-white/10 bg-black/20 p-3">
+                <article key={post.id} className="rounded-lg border border-[var(--glass-border)] bg-[var(--bg-raised)] p-3">
                   <p className="text-sm font-medium">{post.title}</p>
-                  <p className="mt-1 text-xs text-white/55 line-clamp-2">{post.description}</p>
-                  <p className="mt-2 text-[11px] text-white/45">{post.contentKind || "feed"} · {post.deliveryTarget || "fanfront"}</p>
+                  <p className="mt-1 text-xs text-[var(--ink-muted)] line-clamp-2">{post.description}</p>
+                  <p className="mt-1.5 text-[10px] text-[var(--ink-faint)]">{post.contentKind || "feed"} · {post.deliveryTarget || "fanfront"}</p>
                 </article>
               ))
             )}
           </div>
         </div>
-
-        <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
-          <h4 className="text-sm uppercase tracking-[0.2em] text-[#C9A84C] mb-3">Recent Vault Items</h4>
-          <div className="space-y-3">
+        <div className="glass-card p-4">
+          <h4 className="eyebrow mb-3">Recent Vault Items</h4>
+          <div className="space-y-2">
             {initialVaultItems.length === 0 ? (
-              <p className="text-sm text-white/60">No vault items yet.</p>
+              <p className="text-xs text-[var(--ink-muted)]">No vault items yet.</p>
             ) : (
               initialVaultItems.map((item) => (
-                <article key={item.id} className="rounded-xl border border-white/10 bg-black/20 p-3">
+                <article key={item.id} className="rounded-lg border border-[var(--glass-border)] bg-[var(--bg-raised)] p-3">
                   <p className="text-sm font-medium">{item.title}</p>
-                  <p className="mt-1 text-xs text-white/55 line-clamp-2">{item.description}</p>
-                  <p className="mt-2 text-[11px] text-white/45">{item.contentKind || "store"} · {item.status} · {item.deliveryTarget || "fanfront"}</p>
+                  <p className="mt-1 text-xs text-[var(--ink-muted)] line-clamp-2">{item.description}</p>
+                  <p className="mt-1.5 text-[10px] text-[var(--ink-faint)]">{item.contentKind || "store"} · {item.status} · {item.deliveryTarget || "fanfront"}</p>
                 </article>
               ))
             )}

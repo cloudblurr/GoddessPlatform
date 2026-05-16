@@ -1,23 +1,25 @@
-import { DollarSign, Eye, Users, TrendingUp, FileText, Heart, Database, HardDrive, Clock, CheckCircle2, AlertCircle } from "lucide-react";
+import {
+  DollarSign, Eye, Users, TrendingUp, FileText, Heart,
+  Database, HardDrive, Clock, CheckCircle2, AlertCircle,
+} from "lucide-react";
 import { requireCreator } from "@/lib/guards";
 import { listR2Files, r2IsConfigured } from "@/lib/r2";
 
 export default async function CreatorDashboard() {
   const session = await requireCreator();
 
-  // Real R2 storage stats
   let storageStats = { usedBytes: 0, fileCount: 0, configured: false };
   if (r2IsConfigured()) {
     try {
       const files = await listR2Files(`creators/${session.userId}/uploads/`, 500);
-      const fileItems = files.filter(f => !f.isFolder);
+      const fileItems = files.filter((f) => !f.isFolder);
       storageStats = {
         usedBytes: fileItems.reduce((s, f) => s + f.size, 0),
         fileCount: fileItems.length,
         configured: true,
       };
     } catch {
-      // R2 not reachable yet
+      /* R2 not reachable */
     }
   }
 
@@ -29,134 +31,111 @@ export default async function CreatorDashboard() {
   }
 
   return (
-    <div className="flex flex-col gap-8 w-full animate-in fade-in slide-in-from-bottom-6 duration-700">
-
-      <header className="flex items-end justify-between border-b border-white/10 pb-6">
+    <div className="space-y-8 animate-fade-in">
+      {/* Header */}
+      <header className="flex items-end justify-between border-b border-[var(--glass-border)] pb-5">
         <div>
-          <h2 className="text-sm font-mono tracking-[0.2em] text-[#C9A84C] uppercase mb-2">Analytics</h2>
-          <h1 className="text-4xl font-heading font-medium tracking-tight">Dashboard</h1>
+          <p className="eyebrow mb-1">Overview</p>
+          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
         </div>
-        <div className="px-4 py-2 rounded-full border border-green-500/30 bg-green-500/10 text-green-400 font-mono text-xs flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-          LIVE
-        </div>
+        <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-400">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          Online
+        </span>
       </header>
 
-      {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <MetricCard label="Total Revenue" value="$0" icon={DollarSign} />
-        <MetricCard label="Active Subscribers" value="0" icon={Users} />
-        <MetricCard label="Total Posts" value="0" icon={FileText} />
-        <MetricCard label="Total Engagement" value="0" icon={Heart} />
+      {/* Metrics */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <MetricCard label="Revenue" value="$0" icon={DollarSign} />
+        <MetricCard label="Subscribers" value="0" icon={Users} />
+        <MetricCard label="Posts" value="0" icon={FileText} />
+        <MetricCard label="Engagement" value="0" icon={Heart} />
       </div>
 
       {/* Storage */}
       <section>
-        <h3 className="text-lg font-medium text-white/80 mb-4">Cloud Storage · R2</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="p-6 rounded-2xl bg-white/[0.03] border border-white/10">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-white/60 text-sm">Storage Used</span>
-              <Database size={20} className="text-[#C9A84C]" />
+        <h2 className="text-sm font-semibold text-[var(--ink-muted)] uppercase tracking-wider mb-3">Cloud Storage · R2</h2>
+        <div className="grid sm:grid-cols-3 gap-4">
+          <div className="glass-card p-5">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs text-[var(--ink-muted)]">Storage Used</span>
+              <Database size={16} className="text-[var(--accent)]" />
             </div>
-            <div className="text-3xl font-medium tracking-tight mb-2">
-              {formatBytes(storageStats.usedBytes)}
-            </div>
+            <p className="text-2xl font-bold">{formatBytes(storageStats.usedBytes)}</p>
             {storageStats.configured ? (
-              <div className="flex items-center gap-1.5 text-xs text-emerald-400">
-                <CheckCircle2 size={12} /> R2 Connected · xanna-media
-              </div>
+              <p className="flex items-center gap-1 text-[10px] text-emerald-400 mt-1"><CheckCircle2 size={10} /> R2 Connected</p>
             ) : (
-              <div className="flex items-center gap-1.5 text-xs text-amber-400">
-                <AlertCircle size={12} /> Add R2 credentials to .env
-              </div>
+              <p className="flex items-center gap-1 text-[10px] text-amber-400 mt-1"><AlertCircle size={10} /> Add R2 credentials</p>
             )}
           </div>
-
-          <div className="p-6 rounded-2xl bg-white/[0.03] border border-white/10">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-white/60 text-sm">Total Files</span>
-              <HardDrive size={20} className="text-[#C9A84C]" />
+          <div className="glass-card p-5">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs text-[var(--ink-muted)]">Total Files</span>
+              <HardDrive size={16} className="text-[var(--accent)]" />
             </div>
-            <div className="text-3xl font-medium tracking-tight">
-              {storageStats.fileCount.toLocaleString()}
-            </div>
-            <p className="text-xs text-white/40 mt-1">Stored in Cloudflare R2</p>
+            <p className="text-2xl font-bold">{storageStats.fileCount.toLocaleString()}</p>
+            <p className="text-[10px] text-[var(--ink-faint)] mt-1">Cloudflare R2</p>
           </div>
-
-          <div className="p-6 rounded-2xl bg-white/[0.03] border border-white/10">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-white/60 text-sm">Bucket</span>
-              <Clock size={20} className="text-[#C9A84C]" />
+          <div className="glass-card p-5">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs text-[var(--ink-muted)]">Bucket</span>
+              <Clock size={16} className="text-[var(--accent)]" />
             </div>
-            <div className="text-xl font-medium tracking-tight font-mono">xanna-media</div>
-            <p className="text-xs text-white/40 mt-1">WNAM · Cloudflare R2</p>
+            <p className="text-lg font-bold font-mono">xanna-media</p>
+            <p className="text-[10px] text-[var(--ink-faint)] mt-1">WNAM · Cloudflare R2</p>
           </div>
         </div>
       </section>
 
       {/* Quick Actions */}
       <section>
-        <h3 className="text-lg font-medium text-white/80 mb-4">Quick Actions</h3>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <h2 className="text-sm font-semibold text-[var(--ink-muted)] uppercase tracking-wider mb-3">Quick Actions</h2>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {[
             { href: "/creator/studio", icon: FileText, label: "Create Post", sub: "Share new content" },
             { href: "/creator/storage", icon: Database, label: "Upload Media", sub: "Add to R2 vault" },
             { href: "/creator/payouts", icon: DollarSign, label: "Request Payout", sub: "Withdraw earnings" },
-            { href: "/demo", icon: Eye, label: "Demo Mode", sub: "Explore platform", accent: "purple" },
-          ].map(({ href, icon: Icon, label, sub, accent }) => (
+            { href: "/demo", icon: Eye, label: "Demo Mode", sub: "Explore platform" },
+          ].map(({ href, icon: Icon, label, sub }) => (
             <a
               key={href}
               href={href}
-              className={`p-6 rounded-2xl border transition-all group
-                ${accent === "purple"
-                  ? "border-purple-500/30 bg-linear-to-br from-purple-500/10 to-transparent hover:border-purple-500/50"
-                  : "border-white/10 bg-linear-to-br from-white/[0.03] to-transparent hover:border-[#C9A84C]/30"}`}
+              className="glass-card p-4 flex items-center gap-3 hover:border-[var(--accent)]/20 transition-colors group"
             >
-              <div className="flex items-center gap-4">
-                <div className={`p-3 rounded-xl transition-all
-                  ${accent === "purple"
-                    ? "bg-purple-500/20 group-hover:bg-purple-500/30"
-                    : "bg-[#C9A84C]/10 group-hover:bg-[#C9A84C]/20"}`}>
-                  <Icon size={24} className={accent === "purple" ? "text-purple-400" : "text-[#C9A84C]"} />
-                </div>
-                <div>
-                  <h4 className="font-medium mb-1">{label}</h4>
-                  <p className="text-sm text-white/50">{sub}</p>
-                </div>
+              <div className="w-9 h-9 rounded-lg bg-[var(--accent-dim)] flex items-center justify-center shrink-0 group-hover:bg-[var(--accent-glow)] transition-colors">
+                <Icon size={16} className="text-[var(--accent)]" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold">{label}</p>
+                <p className="text-[11px] text-[var(--ink-faint)]">{sub}</p>
               </div>
             </a>
           ))}
         </div>
       </section>
 
-      {/* Setup notice */}
-      <div className="p-6 rounded-2xl border border-blue-500/20 bg-blue-500/5">
-        <div className="flex items-start gap-4">
-          <div className="p-2 rounded-lg bg-blue-500/10">
-            <TrendingUp size={20} className="text-blue-400" />
-          </div>
-          <div>
-            <h4 className="font-medium text-blue-400 mb-1">Analytics Coming Soon</h4>
-            <p className="text-sm text-white/60">
-              Real-time analytics will be available once Supabase is connected and you start creating content.
-            </p>
-          </div>
+      {/* Info notice */}
+      <div className="glass-card p-5 border-blue-500/20 flex items-start gap-3">
+        <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center shrink-0">
+          <TrendingUp size={15} className="text-blue-400" />
+        </div>
+        <div>
+          <p className="text-sm font-semibold text-blue-400">Analytics Coming Soon</p>
+          <p className="text-xs text-[var(--ink-muted)] mt-0.5">Real-time analytics will be available once Supabase is connected.</p>
         </div>
       </div>
-
     </div>
   );
 }
 
 function MetricCard({ label, value, icon: Icon }: { label: string; value: string; icon: React.ComponentType<{ size?: number; className?: string }> }) {
   return (
-    <div className="p-6 rounded-2xl bg-white/[0.03] border border-white/10">
-      <div className="flex items-center justify-between mb-4">
-        <span className="text-white/60 text-sm font-medium">{label}</span>
-        <Icon size={20} className="text-[#C9A84C]" />
+    <div className="glass-card p-5">
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-xs text-[var(--ink-muted)] font-medium">{label}</span>
+        <Icon size={16} className="text-[var(--accent)]" />
       </div>
-      <span className="text-3xl font-medium tracking-tight">{value}</span>
+      <p className="text-2xl font-bold tracking-tight">{value}</p>
     </div>
   );
 }

@@ -1,98 +1,36 @@
 import { requireCreator } from "@/lib/guards";
-import { Settings as SettingsIcon, User, Bell, Lock, CreditCard, Key } from "lucide-react";
+import { User, Bell, Lock, CreditCard, Key } from "lucide-react";
 
 export default async function SettingsPage() {
   await requireCreator();
 
+  const items = [
+    { icon: User, title: "Account", sub: "Profile, email, personal info", label: "Edit Account" },
+    { icon: Lock, title: "Privacy & Security", sub: "Password, 2FA, privacy controls", label: "Manage Security" },
+    { icon: Bell, title: "Notifications", sub: "Email and push notifications", label: "Edit Preferences" },
+    { icon: CreditCard, title: "Payment Methods", sub: "Payout accounts and tax info", label: "Manage Payments" },
+    { icon: Key, title: "API Keys", sub: "Generate and manage tokens", label: "View API Keys" },
+  ];
+
   return (
-    <div className="flex flex-col gap-8 w-full animate-in fade-in slide-in-from-bottom-6 duration-700">
-      
-      <header className="flex items-end justify-between border-b border-white/10 pb-6">
-        <div>
-          <h2 className="text-sm font-mono tracking-[0.2em] text-[#C9A84C] uppercase mb-2">Configuration</h2>
-          <h1 className="text-4xl font-heading font-medium tracking-tight">Settings</h1>
-          <p className="text-white/60 mt-2">Manage your account and preferences</p>
-        </div>
+    <div className="space-y-6 animate-fade-in">
+      <header className="border-b border-[var(--glass-border)] pb-5">
+        <p className="eyebrow mb-1">Configuration</p>
+        <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
       </header>
 
-      {/* Settings Categories */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="p-6 rounded-2xl border border-white/10 bg-[#ffffff05]">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 rounded-lg bg-[#C9A84C]/10">
-              <User size={20} className="text-[#C9A84C]" />
+      <div className="grid sm:grid-cols-2 gap-4">
+        {items.map(({ icon: Icon, title, sub, label }) => (
+          <div key={title} className="glass-card p-4">
+            <div className="flex items-center gap-2.5 mb-3">
+              <div className="w-8 h-8 rounded-lg bg-[var(--accent-dim)] flex items-center justify-center"><Icon size={15} className="text-[var(--accent)]" /></div>
+              <h3 className="text-sm font-semibold">{title}</h3>
             </div>
-            <h3 className="font-medium">Account Settings</h3>
+            <p className="text-xs text-[var(--ink-muted)] mb-3">{sub}</p>
+            <button className="px-3 py-1.5 rounded-md bg-[var(--accent-dim)] text-[var(--accent)] text-xs font-medium hover:bg-[var(--accent-glow)] transition-colors">{label}</button>
           </div>
-          <p className="text-sm text-white/60 mb-4">
-            Update your profile, email, and personal information
-          </p>
-          <button className="px-4 py-2 rounded-lg bg-[#C9A84C]/10 text-[#C9A84C] text-sm hover:bg-[#C9A84C]/20 transition-all">
-            Edit Account
-          </button>
-        </div>
-
-        <div className="p-6 rounded-2xl border border-white/10 bg-[#ffffff05]">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 rounded-lg bg-[#C9A84C]/10">
-              <Lock size={20} className="text-[#C9A84C]" />
-            </div>
-            <h3 className="font-medium">Privacy & Security</h3>
-          </div>
-          <p className="text-sm text-white/60 mb-4">
-            Password, 2FA, and privacy controls
-          </p>
-          <button className="px-4 py-2 rounded-lg bg-[#C9A84C]/10 text-[#C9A84C] text-sm hover:bg-[#C9A84C]/20 transition-all">
-            Manage Security
-          </button>
-        </div>
-
-        <div className="p-6 rounded-2xl border border-white/10 bg-[#ffffff05]">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 rounded-lg bg-[#C9A84C]/10">
-              <Bell size={20} className="text-[#C9A84C]" />
-            </div>
-            <h3 className="font-medium">Notifications</h3>
-          </div>
-          <p className="text-sm text-white/60 mb-4">
-            Configure email and push notifications
-          </p>
-          <button className="px-4 py-2 rounded-lg bg-[#C9A84C]/10 text-[#C9A84C] text-sm hover:bg-[#C9A84C]/20 transition-all">
-            Edit Preferences
-          </button>
-        </div>
-
-        <div className="p-6 rounded-2xl border border-white/10 bg-[#ffffff05]">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 rounded-lg bg-[#C9A84C]/10">
-              <CreditCard size={20} className="text-[#C9A84C]" />
-            </div>
-            <h3 className="font-medium">Payment Methods</h3>
-          </div>
-          <p className="text-sm text-white/60 mb-4">
-            Manage payout accounts and tax information
-          </p>
-          <button className="px-4 py-2 rounded-lg bg-[#C9A84C]/10 text-[#C9A84C] text-sm hover:bg-[#C9A84C]/20 transition-all">
-            Manage Payments
-          </button>
-        </div>
-
-        <div className="p-6 rounded-2xl border border-white/10 bg-[#ffffff05]">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 rounded-lg bg-[#C9A84C]/10">
-              <Key size={20} className="text-[#C9A84C]" />
-            </div>
-            <h3 className="font-medium">API Keys</h3>
-          </div>
-          <p className="text-sm text-white/60 mb-4">
-            Generate and manage API access tokens
-          </p>
-          <button className="px-4 py-2 rounded-lg bg-[#C9A84C]/10 text-[#C9A84C] text-sm hover:bg-[#C9A84C]/20 transition-all">
-            View API Keys
-          </button>
-        </div>
+        ))}
       </div>
-
     </div>
   );
 }

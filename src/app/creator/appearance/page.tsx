@@ -2,6 +2,9 @@ import { updateAppearanceSettings } from "@/app/actions";
 import { readStore } from "@/lib/store";
 import { CheckCircle2, Save } from "lucide-react";
 
+const inputCls = "w-full rounded-lg border border-[var(--glass-border)] bg-[var(--bg-raised)] px-3 py-2 text-sm focus:outline-none focus:border-[var(--accent)]/40 transition-colors";
+const labelCls = "block text-[10px] font-semibold uppercase tracking-wider text-[var(--ink-faint)] mb-1.5";
+
 export default async function CreatorAppearancePage({ searchParams }: { searchParams: Promise<{ saved?: string }> }) {
   const { saved } = await searchParams;
   const store = await readStore();
@@ -17,183 +20,59 @@ export default async function CreatorAppearancePage({ searchParams }: { searchPa
     ]
   };
 
+  const previews = [
+    { n: 1, prefix: "p1", defaults: settings.previews[0] },
+    { n: 2, prefix: "p2", defaults: settings.previews[1] },
+    { n: 3, prefix: "p3", defaults: settings.previews[2] },
+    { n: 4, prefix: "p4", defaults: settings.previews[3] },
+  ];
+
   return (
-    <div className="space-y-8 pb-20">
-      <header className="flex justify-between items-end border-b border-[#ffffff10] pb-6">
-        <div>
-          <h2 className="text-3xl font-heading text-white">Appearance Settings</h2>
-          <p className="text-[#ffffff80] mt-1 text-sm max-w-xl">
-            Customize the unauthenticated entry page. Change your hero messaging and teasers.
-          </p>
-        </div>
+    <div className="space-y-6 animate-fade-in pb-12">
+      <header className="border-b border-[var(--glass-border)] pb-5">
+        <p className="eyebrow mb-1">Branding</p>
+        <h1 className="text-3xl font-bold tracking-tight">Appearance</h1>
+        <p className="text-xs text-[var(--ink-muted)] mt-1">Customize the entry page hero and teasers.</p>
       </header>
 
       {saved && (
-        <div className="bg-[#10b98110] border border-[#10b98130] text-[#10b981] p-4 rounded-xl flex items-center justify-center gap-3">
-          <CheckCircle2 size={18} />
-          <span className="font-medium text-sm">Appearance settings saved successfully.</span>
+        <div className="flex items-center justify-center gap-2 rounded-lg border border-emerald-500/20 bg-emerald-500/10 p-3 text-sm font-medium text-emerald-400">
+          <CheckCircle2 size={15} /> Settings saved
         </div>
       )}
 
-      <form action={updateAppearanceSettings} className="space-y-8 bg-[#0a0a0a] border border-[#ffffff10] p-8 rounded-2xl relative shadow-2xl">
-        <div className="space-y-6 max-w-3xl">
-          <div>
-            <h3 className="text-xl font-heading text-gold mb-4 relative z-10 border-b border-[#ffffff10] pb-2">Hero Section</h3>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-xs font-medium text-[#ffffff60] uppercase tracking-wider mb-2">Display Name</label>
-                <input
-                  type="text"
-                  name="heroTitle"
-                  required
-                  defaultValue={settings.heroTitle}
-                  className="w-full bg-[#111] border border-[#333] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-gold transition-colors"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-[#ffffff60] uppercase tracking-wider mb-2">Tagline Subtitle</label>
-                <input
-                  type="text"
-                  name="heroSubtitle"
-                  required
-                  defaultValue={settings.heroSubtitle}
-                  className="w-full bg-[#111] border border-[#333] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-gold transition-colors"
-                />
-              </div>
+      <form action={updateAppearanceSettings} className="glass-card p-5 space-y-6">
+        <div className="max-w-2xl space-y-5">
+          <section>
+            <h3 className="text-sm font-semibold border-b border-[var(--glass-border)] pb-2 mb-4">Hero Section</h3>
+            <div className="space-y-3">
+              <div><label className={labelCls}>Display Name</label><input type="text" name="heroTitle" required defaultValue={settings.heroTitle} className={inputCls} /></div>
+              <div><label className={labelCls}>Tagline</label><input type="text" name="heroSubtitle" required defaultValue={settings.heroSubtitle} className={inputCls} /></div>
             </div>
-          </div>
+          </section>
 
-          <div className="pt-6">
-            <h3 className="text-xl font-heading text-gold mb-4 relative z-10 border-b border-[#ffffff10] pb-2">Teaser Previews</h3>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-xs font-medium text-[#ffffff60] uppercase tracking-wider mb-2">Teaser Section Main Headline</label>
-                <input
-                  type="text"
-                  name="revealHeadline"
-                  required
-                  defaultValue={settings.revealHeadline}
-                  className="w-full bg-[#111] border border-[#333] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-gold transition-colors"
-                />
-              </div>
+          <section>
+            <h3 className="text-sm font-semibold border-b border-[var(--glass-border)] pb-2 mb-4">Teaser Previews</h3>
+            <div className="mb-4"><label className={labelCls}>Section Headline</label><input type="text" name="revealHeadline" required defaultValue={settings.revealHeadline} className={inputCls} /></div>
+            <div className="grid sm:grid-cols-2 gap-4">
+              {previews.map(({ n, prefix, defaults }) => (
+                <div key={n} className="rounded-lg border border-[var(--glass-border)] bg-[var(--bg-surface)] p-3 space-y-2">
+                  <p className="text-[10px] font-semibold text-[var(--ink-faint)] uppercase tracking-wider">Preview {n}</p>
+                  <input type="text" name={`${prefix}Title`} placeholder="Title" defaultValue={defaults?.title} required className={inputCls} />
+                  <input type="text" name={`${prefix}Url`} placeholder="Media URL" defaultValue={defaults?.mediaUrl} required className={inputCls} />
+                  <select name={`${prefix}Type`} defaultValue={defaults?.mediaType} className={inputCls}>
+                    <option value="image">Image</option>
+                    <option value="video">Video</option>
+                  </select>
+                </div>
+              ))}
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-              {/* Preview 1 */}
-              <div className="p-4 border border-[#333] rounded-xl bg-[#050505]">
-                <h4 className="font-mono text-sm text-[#ffffff80] mb-3">Preview 1</h4>
-                <div className="space-y-3">
-                  <input
-                    type="text"
-                    name="p1Title"
-                    placeholder="Title (e.g. Platinum Dripped Aura)"
-                    defaultValue={settings.previews[0]?.title}
-                    required
-                    className="w-full bg-[#111] border border-[#333] rounded-md px-3 py-2 text-sm text-white focus:outline-none focus:border-gold"
-                  />
-                  <input
-                    type="text"
-                    name="p1Url"
-                    placeholder="Media URL (e.g. /logo-1.png)"
-                    defaultValue={settings.previews[0]?.mediaUrl}
-                    required
-                    className="w-full bg-[#111] border border-[#333] rounded-md px-3 py-2 text-sm text-white focus:outline-none focus:border-gold"
-                  />
-                  <select name="p1Type" defaultValue={settings.previews[0]?.mediaType} className="w-full bg-[#111] border border-[#333] rounded-md px-3 py-2 text-sm text-white focus:outline-none focus:border-gold">
-                    <option value="image">Image</option>
-                    <option value="video">Video</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Preview 2 */}
-              <div className="p-4 border border-[#333] rounded-xl bg-[#050505]">
-                <h4 className="font-mono text-sm text-[#ffffff80] mb-3">Preview 2</h4>
-                <div className="space-y-3">
-                  <input
-                    type="text"
-                    name="p2Title"
-                    placeholder="Title (e.g. Eternal Grace)"
-                    defaultValue={settings.previews[1]?.title}
-                    required
-                    className="w-full bg-[#111] border border-[#333] rounded-md px-3 py-2 text-sm text-white focus:outline-none focus:border-gold"
-                  />
-                  <input
-                    type="text"
-                    name="p2Url"
-                    placeholder="Media URL (e.g. /logo-2.png)"
-                    defaultValue={settings.previews[1]?.mediaUrl}
-                    required
-                    className="w-full bg-[#111] border border-[#333] rounded-md px-3 py-2 text-sm text-white focus:outline-none focus:border-gold"
-                  />
-                  <select name="p2Type" defaultValue={settings.previews[1]?.mediaType} className="w-full bg-[#111] border border-[#333] rounded-md px-3 py-2 text-sm text-white focus:outline-none focus:border-gold">
-                    <option value="image">Image</option>
-                    <option value="video">Video</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Preview 3 */}
-              <div className="p-4 border border-[#333] rounded-xl bg-[#050505]">
-                <h4 className="font-mono text-sm text-[#ffffff80] mb-3">Preview 3</h4>
-                <div className="space-y-3">
-                  <input
-                    type="text"
-                    name="p3Title"
-                    placeholder="Title"
-                    defaultValue={settings.previews[2]?.title}
-                    required
-                    className="w-full bg-[#111] border border-[#333] rounded-md px-3 py-2 text-sm text-white focus:outline-none focus:border-gold"
-                  />
-                  <input
-                    type="text"
-                    name="p3Url"
-                    placeholder="Media URL"
-                    defaultValue={settings.previews[2]?.mediaUrl}
-                    required
-                    className="w-full bg-[#111] border border-[#333] rounded-md px-3 py-2 text-sm text-white focus:outline-none focus:border-gold"
-                  />
-                  <select name="p3Type" defaultValue={settings.previews[2]?.mediaType} className="w-full bg-[#111] border border-[#333] rounded-md px-3 py-2 text-sm text-white focus:outline-none focus:border-gold">
-                    <option value="image">Image</option>
-                    <option value="video">Video</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Preview 4 */}
-              <div className="p-4 border border-[#333] rounded-xl bg-[#050505]">
-                <h4 className="font-mono text-sm text-[#ffffff80] mb-3">Preview 4</h4>
-                <div className="space-y-3">
-                  <input
-                    type="text"
-                    name="p4Title"
-                    placeholder="Title"
-                    defaultValue={settings.previews[3]?.title}
-                    required
-                    className="w-full bg-[#111] border border-[#333] rounded-md px-3 py-2 text-sm text-white focus:outline-none focus:border-gold"
-                  />
-                  <input
-                    type="text"
-                    name="p4Url"
-                    placeholder="Media URL"
-                    defaultValue={settings.previews[3]?.mediaUrl}
-                    required
-                    className="w-full bg-[#111] border border-[#333] rounded-md px-3 py-2 text-sm text-white focus:outline-none focus:border-gold"
-                  />
-                  <select name="p4Type" defaultValue={settings.previews[3]?.mediaType} className="w-full bg-[#111] border border-[#333] rounded-md px-3 py-2 text-sm text-white focus:outline-none focus:border-gold">
-                    <option value="image">Image</option>
-                    <option value="video">Video</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-          </div>
+          </section>
         </div>
 
-        <div className="flex justify-end pt-4 border-t border-[#ffffff10]">
-          <button type="submit" className="bg-[#C9A84C] hover:bg-white text-black font-semibold rounded-lg px-6 py-3 flex items-center gap-2 transition-colors shadow-[0_0_20px_rgba(201,168,76,0.3)]">
-            <Save size={18} />
-            Save Changes
+        <div className="flex justify-end pt-4 border-t border-[var(--glass-border)]">
+          <button type="submit" className="inline-flex items-center gap-2 rounded-lg bg-[var(--accent)] text-[var(--bg-base)] px-5 py-2.5 text-xs font-semibold hover:brightness-110 transition-all">
+            <Save size={14} /> Save Changes
           </button>
         </div>
       </form>
